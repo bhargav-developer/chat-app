@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Upload } from 'lucide-react'; 
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 const presetAvatars = {
   maleAvatar: [
@@ -21,17 +22,19 @@ const presetAvatars = {
 
 const ProfilePage = () => {
   const [gender, setGender] = useState<'male' | 'female'>('male');
-  const [avatarList, setAvatarList] = useState<string[]>(presetAvatars.femaleAvatar);
-  const [selectedAvatar, setSelectedAvatar] = useState<string>(presetAvatars.femaleAvatar[0]);
-  const router = useRouter()
+  const [avatarList, setAvatarList] = useState<string[]>(presetAvatars.maleAvatar);
+  const [selectedAvatar, setSelectedAvatar] = useState<string>(presetAvatars.maleAvatar[0]);
+  const [name, setName] = useState<string>('');
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
     bio: '',
     phone: '',
     location: '',
   });
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const avatars = gender === 'male' ? presetAvatars.maleAvatar : presetAvatars.femaleAvatar;
@@ -40,27 +43,23 @@ const ProfilePage = () => {
   }, [gender]);
 
   useEffect(() => {
-    fetchUserDetails()
+    fetchUserDetails();
   }, []);
-  
-  const fetchUserDetails = async () =>{
-    try{
-      const res = await axios.get("/api/auth/me")
-      if(res.status === 200){
-        const userDetails = await res.data.user
-        setFormData({ ...formData,
-          email: userDetails.email,
-          name:  `${userDetails.firstName}  ${userDetails.lastName}`
-        })
-        return
+
+  const fetchUserDetails = async () => {
+    try {
+      const res = await axios.get('/api/auth/me');
+      if (res.status === 200) {
+        const userDetails = res.data.user;
+        setFormData({ ...formData, email: userDetails.email });
+        setName(`${userDetails.firstName} ${userDetails.lastName}`);
       }
-    }catch(err){
-      console.log(err)
-      router.push("./login")
+    } catch (err) {
+      router.push('/login');
+    } finally {
+      setLoading(false);
     }
-
-
-  }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,8 +74,11 @@ const ProfilePage = () => {
   };
 
   const handleSubmit = () => {
+    toast.success('Profile updated!');
     console.log('Saved Profile:', { ...formData, avatar: selectedAvatar, gender });
   };
+
+  if (loading) return <div className="text-center flex justify-center items-center h-[100vh]">Loading</div>;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-indigo-100 to-indigo-200 p-6">
@@ -94,7 +96,7 @@ const ProfilePage = () => {
               <img
                 key={index}
                 src={avatar}
-                className={`w-10 h-10 rounded-full object-cover cursor-pointer border-2 transition-all duration-300 ${
+                className={`w-10 h-10 rounded-full object-cover cursor-pointer border-2 transition-all duration-300 transform hover:scale-105 ${
                   selectedAvatar === avatar
                     ? 'border-indigo-500 ring-2 ring-indigo-300'
                     : 'border-transparent hover:border-gray-300'
@@ -121,36 +123,28 @@ const ProfilePage = () => {
 
         {/* Right - Form */}
         <div className="md:w-2/3 p-8 space-y-4">
-          <h2 className="text-3xl font-bold text-indigo-900 mb-4">Edit Profile</h2>
+          <h2 className="text-3xl font-bold text-indigo-900 mb-4">{name && `Hi ${name},`} <br /> Let’s Get to Know You more</h2>
 
-
-          <InputField label="Name" name="name" value={formData.name} onChange={handleChange} />
           <InputField label="Email" name="email" value={formData.email} onChange={handleChange} type="email" />
+
+          {/* Gender Toggle Buttons */}
           <div className="flex gap-4 mb-2">
-            <label className="flex items-center text-black gap-2">
-            <label className="flex items-center text-black gap-2">
-              <input
-                type="radio"
-                name="gender"
-                value="male"
-                checked={gender === 'male'}
-                onChange={() => setGender('male')}
-                className="accent-indigo-600"
-              />
-              Male
-            </label>
-              <input
-                type="radio"
-                name="gender"
-                value="female"
-                checked={gender === 'female'}
-                onChange={() => setGender('female')}
-                className="accent-indigo-600"
-              />
-              Female
-            </label>
-            
+            {['male', 'female'].map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => setGender(g as 'male' | 'female')}
+                className={`px-4 py-2 rounded-lg border ${
+                  gender === g
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white/60 border-gray-300 text-gray-700 hover:bg-indigo-100'
+                } transition`}
+              >
+                {g.charAt(0).toUpperCase() + g.slice(1)}
+              </button>
+            ))}
           </div>
+
           <InputField label="Phone (optional)" name="phone" value={formData.phone} onChange={handleChange} />
           <InputField label="Location" name="location" value={formData.location} onChange={handleChange} />
 

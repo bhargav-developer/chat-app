@@ -2,6 +2,8 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import toast from 'react-hot-toast';
+
 
 const Page = () => {
   const router = useRouter();
@@ -44,12 +46,12 @@ const Page = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.success("Passwords do not match!");
       return;
     }
 
     if (passwordError) {
-      alert("Please fix the password issue first.");
+      toast.success("Please fix the password issue first.");
       return;
     }
 
@@ -60,14 +62,14 @@ const Page = () => {
       })
 
       if (res.status === 201) {
-        alert('Registration successful!');
+        toast.success('Registration successful!');
         router.push('./profile');
       } else {
-        alert('Registration failed!');
+        toast.success('Registration failed!');
       }
     } catch (err: any) {
       const errMessage = await err.response.data.message
-      alert(errMessage || "Something went Wrong");
+      toast.success(errMessage || "Something went Wrong");
     }finally{
       setLoading(false)
     }

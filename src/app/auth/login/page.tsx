@@ -2,6 +2,8 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import toast from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 
 const page = () => {
   const router = useRouter();
@@ -21,30 +23,30 @@ const page = () => {
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     try{
-
+      setLoading(true)
       if(!loginData.email || !loginData.password){
         console.log(loginData.email)
-      alert("Please Enter Your Credits ")
+      toast.success("Please Enter Your Credits ")
       return
     }
     const res = await axios.post("/api/auth/login",loginData,{
       withCredentials: true
     })
     if(res.status === 200){
-      alert("U are Loggedin")
+      toast.success("U are Loggedin")
       router.push("/")
       
     }
   }catch(err: any){
     const message = await err.response.data.message
-    alert(message || "Something went wrong")
+    toast.error(message || "Something went wrong")
     console.log(message)
     if(err.status === 403){
       router.push("./profile")
       return
     }
   }finally{
-
+    setLoading(false)
   }
 
 
@@ -54,6 +56,7 @@ const page = () => {
 return (
 
     <>
+       <Toaster position="bottom-right" />
        <div className="min-h-screen flex items-center justify-center bg-[#f0f4ff] px-4">
       <div className="bg-white rounded-2xl shadow-lg max-w-md w-full overflow-hidden">
         {/* Header with image */}
