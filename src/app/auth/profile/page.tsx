@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Upload } from 'lucide-react'; 
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const presetAvatars = {
   maleAvatar: [
@@ -22,6 +23,7 @@ const ProfilePage = () => {
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [avatarList, setAvatarList] = useState<string[]>(presetAvatars.femaleAvatar);
   const [selectedAvatar, setSelectedAvatar] = useState<string>(presetAvatars.femaleAvatar[0]);
+  const router = useRouter()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -42,12 +44,21 @@ const ProfilePage = () => {
   }, []);
   
   const fetchUserDetails = async () =>{
-    const res = await axios.get("/api/auth/me")
-    if(res.status === 200){
-      setFormData({ ...formData,
-        email: res.data.user.email
-      })
+    try{
+      const res = await axios.get("/api/auth/me")
+      if(res.status === 200){
+        const userDetails = await res.data.user
+        setFormData({ ...formData,
+          email: userDetails.email,
+          name:  `${userDetails.firstName}  ${userDetails.lastName}`
+        })
+        return
+      }
+    }catch(err){
+      console.log(err)
+      router.push("./login")
     }
+
 
   }
 
@@ -140,7 +151,7 @@ const ProfilePage = () => {
             </label>
             
           </div>
-          <InputField label="Phone" name="phone" value={formData.phone} onChange={handleChange} />
+          <InputField label="Phone (optional)" name="phone" value={formData.phone} onChange={handleChange} />
           <InputField label="Location" name="location" value={formData.location} onChange={handleChange} />
 
           <div>

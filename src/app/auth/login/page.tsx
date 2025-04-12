@@ -1,9 +1,55 @@
 "use client"
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const page = () => {
   const router = useRouter();
+    const [loading, setLoading] = useState(false);
+  const [loginData,setLoginData] = useState({
+    email: "",
+    password: ""
+  })
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const {name,value} = e.target;
+    setLoginData(prev =>  ({
+      ...prev,
+      [name]: value,
+    }))
+    console.log(loginData)
+  }
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    try{
+
+      if(!loginData.email || !loginData.password){
+        console.log(loginData.email)
+      alert("Please Enter Your Credits ")
+      return
+    }
+    const res = await axios.post("/api/auth/login",loginData,{
+      withCredentials: true
+    })
+    if(res.status === 200){
+      alert("U are Loggedin")
+      router.push("/")
+      
+    }
+  }catch(err: any){
+    const message = await err.response.data.message
+    alert(message || "Something went wrong")
+    console.log(message)
+    if(err.status === 403){
+      router.push("./profile")
+      return
+    }
+  }finally{
+
+  }
+
+
+
+  }
 
 return (
 
@@ -27,12 +73,16 @@ return (
         <div className="px-6 py-8">
           <h2 className="text-2xl text-black font-semibold mb-6">Welcome back</h2>
 
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div>
               <label className="block text-black  text-sm font-medium mb-1">Email</label>
               <input
                 type="email"
                 placeholder="your@email.com"
+                name = "email"
+                value={loginData.email}
+                required
+                onChange={(e) => handleChange(e)}
                 className="w-full border text-black  border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -44,6 +94,10 @@ return (
               </label>
               <input
                 type="password"
+                value={loginData.password}
+                onChange={(e) => handleChange(e)}
+                name="password"
+                required
                 className="w-full border text-black  border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -55,9 +109,10 @@ return (
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition disabled:bg-gray-500"
+              disabled={loading}
             >
-              Sign in
+              {loading ? 'loading...' :'login'}
             </button>
           </form>
 

@@ -1,7 +1,10 @@
-interface user{
-    id: string,
+interface userInterface{
+    _id: string,
     username: string,
     email: string,
     password: string,
-    profileImg?: string
+    avatar?: string,
+    comparePassword(candidatePassword: string): Promise<boolean>;
 }
+
+export default userInterface
