@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Upload } from 'lucide-react'; 
+import { Upload } from 'lucide-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -26,6 +26,7 @@ const ProfilePage = () => {
   const [selectedAvatar, setSelectedAvatar] = useState<string>(presetAvatars.maleAvatar[0]);
   const [name, setName] = useState<string>('');
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -33,8 +34,6 @@ const ProfilePage = () => {
     phone: '',
     location: '',
   });
-
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const avatars = gender === 'male' ? presetAvatars.maleAvatar : presetAvatars.femaleAvatar;
@@ -51,8 +50,18 @@ const ProfilePage = () => {
       const res = await axios.get('/api/auth/me');
       if (res.status === 200) {
         const userDetails = res.data.user;
-        setFormData({ ...formData, email: userDetails.email });
+        setFormData(prev => ({
+          ...prev,
+          email: userDetails.email || '',
+          bio: userDetails.bio || '',
+          phone: userDetails.phone || '',
+          location: userDetails.location || '',
+        }));
         setName(`${userDetails.firstName} ${userDetails.lastName}`);
+        setSelectedAvatar(userDetails.avatar || presetAvatars.maleAvatar[0]);
+        setGender(userDetails.gender || 'male');
+    console.log(userDetails)
+
       }
     } catch (err) {
       router.push('/login');
@@ -65,20 +74,51 @@ const ProfilePage = () => {
     const file = e.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      setSelectedAvatar(imageUrl);
+      setSelectedAvatar(imageUrl); // For preview only – this won’t persist across sessions
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
-  const handleSubmit = () => {
-    toast.success('Profile updated!');
-    console.log('Saved Profile:', { ...formData, avatar: selectedAvatar, gender });
+  const handleSubmit = async () => {
+    try {
+      if (formData.phone && isNaN(parseInt(formData.phone))) {
+        toast.error("Phone number must be a valid number.");
+        return;
+      }
+
+      const res = await axios.post(
+        '/api/auth/profile',
+        {
+            ...formData,
+            avatar: selectedAvatar,
+            gender,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        toast.success("Profile is updated");
+        router.push("/");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update profile");
+    }
   };
 
-  if (loading) return <div className="text-center flex justify-center items-center h-[100vh]">Loading</div>;
+  if (loading) {
+    return (
+      <div className="text-center flex justify-center items-center h-[100vh]">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-indigo-100 to-indigo-200 p-6">
@@ -96,11 +136,10 @@ const ProfilePage = () => {
               <img
                 key={index}
                 src={avatar}
-                className={`w-10 h-10 rounded-full object-cover cursor-pointer border-2 transition-all duration-300 transform hover:scale-105 ${
-                  selectedAvatar === avatar
+                className={`w-10 h-10 rounded-full object-cover cursor-pointer border-2 transition-all duration-300 transform hover:scale-105 ${selectedAvatar === avatar
                     ? 'border-indigo-500 ring-2 ring-indigo-300'
                     : 'border-transparent hover:border-gray-300'
-                }`}
+                  }`}
                 onClick={() => setSelectedAvatar(avatar)}
                 alt={`Avatar ${index}`}
               />
@@ -123,9 +162,11 @@ const ProfilePage = () => {
 
         {/* Right - Form */}
         <div className="md:w-2/3 p-8 space-y-4">
-          <h2 className="text-3xl font-bold text-indigo-900 mb-4">{name && `Hi ${name},`} <br /> Let’s Get to Know You more</h2>
+          <h2 className="text-3xl font-bold text-indigo-900 mb-4">
+            {name && `Hi ${name},`} <br /> Let’s Get to Know You More
+          </h2>
 
-          <InputField label="Email" name="email" value={formData.email} onChange={handleChange} type="email" />
+          <InputField label="Email" name="email" editable={false} value={formData.email} onChange={handleChange} type="email" />
 
           {/* Gender Toggle Buttons */}
           <div className="flex gap-4 mb-2">
@@ -134,11 +175,10 @@ const ProfilePage = () => {
                 key={g}
                 type="button"
                 onClick={() => setGender(g as 'male' | 'female')}
-                className={`px-4 py-2 rounded-lg border ${
-                  gender === g
+                className={`px-4 py-2 rounded-lg border ${gender === g
                     ? 'bg-indigo-600 text-white border-indigo-600'
                     : 'bg-white/60 border-gray-300 text-gray-700 hover:bg-indigo-100'
-                } transition`}
+                  } transition`}
               >
                 {g.charAt(0).toUpperCase() + g.slice(1)}
               </button>
@@ -174,17 +214,18 @@ const ProfilePage = () => {
 
 export default ProfilePage;
 
-// Reusable InputField component
 const InputField = ({
   label,
   name,
   value,
+  editable = true,
   onChange,
   type = 'text',
 }: {
   label: string;
   name: string;
   value: string;
+  editable?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
 }) => (
@@ -194,6 +235,7 @@ const InputField = ({
       type={type}
       name={name}
       value={value}
+      disabled={!editable}
       onChange={onChange}
       className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white/60 backdrop-blur placeholder-gray-500 text-gray-800"
     />
