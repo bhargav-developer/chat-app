@@ -18,7 +18,6 @@ const page = () => {
       ...prev,
       [name]: value,
     }))
-    console.log(loginData)
   }
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
