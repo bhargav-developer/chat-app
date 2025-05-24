@@ -27,7 +27,7 @@ export default function Home() {
     } catch (error: any) {
       console.log(error)
       if(error.status == 401){
-        router.push("/auth/login")
+        router.push("/login")
       }
     }
   }
