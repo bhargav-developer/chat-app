@@ -1,9 +1,71 @@
-import React from 'react'
+'use client'
 
-const page = () => {
+import { CircleXIcon, PlusIcon } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+
+const Page = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+
+  useEffect(() => {
+    if (isModalOpen) {
+      setShowModal(true)
+    } else {
+      const timeout = setTimeout(() => setShowModal(false), 300)
+      return () => clearTimeout(timeout)
+    }
+  }, [isModalOpen])
+
   return (
-    <div>About</div>
+    <>
+      <div className='px-1'>
+        <div className='flex justify-between'>
+          <h1 className='font-bold text-xl p-3'>Chat List</h1>
+          <div
+            className='bg-indigo-500 flex justify-center items-center m-2 p-2 cursor-pointer rounded-xl text-white'
+            onClick={() => setIsModalOpen(true)}
+          >
+            <PlusIcon />
+          </div>
+        </div>
+      </div>
+
+      {showModal && (
+        <div
+          className={`fixed inset-0 bg-black/50 backdrop-blur-md transition-opacity duration-300 ${
+            isModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-white text-black rounded-2xl transition-all duration-300 ${
+              isModalOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className='flex border-b border-gray-200 p-5 justify-between items-center'>
+              <h1 className='text-xl font-semibold'>Start New Chat</h1>
+              <CircleXIcon
+                className='cursor-pointer'
+                onClick={() => setIsModalOpen(false)}
+              />
+            </div>
+            <div className='p-6'>
+              <h2 className='text-gray-700'>Search contacts</h2>
+              <input
+                type='text'
+                className='p-2 rounded-xl mt-1 border focus:outline-none border-gray-200 w-full'
+                placeholder='Enter name or email'
+              />
+            </div>
+            <div>
+              {/* User contacts */}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
-export default page
+export default Page

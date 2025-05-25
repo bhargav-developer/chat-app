@@ -61,11 +61,11 @@ const currentLinks = [
 ]
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-const {user,setUser} = useUserStore();
+const {user} = useUserStore();
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      <div className="w-[250px] bg-white text-black flex flex-col">
+      <div className="w-[250px] bg-white text-black flex border-r border-gray-100 flex-col">
         <div className="p-6 border-b border-gray-100">
         <h2 className="font-bold text-indigo-600 text-2xl" >Chat Sync</h2>
         </div>
@@ -89,7 +89,7 @@ const {user,setUser} = useUserStore();
       </div>
 
       {/* Main content */}
-      <main className="w-[90%] p-3 bg-red-100">
+      <main className="w-[90%] p-3 bg-white text-black">
         {children}
       </main>
     </div>
