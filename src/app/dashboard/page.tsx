@@ -17,10 +17,11 @@ export default function Home() {
   const getUserInfo = async () => {
      try {
       const res = await axios.get("/api/auth/me",{withCredentials: true});
-      const {_id,firstName,lastName,avatar} = res.data.user;
+      const {_id,firstName,lastName,email,avatar} = res.data.user;
       const userData = {
         id: _id,
-        name: firstName+lastName,
+        email,
+        name: `${firstName} ${lastName}`,
         avatar
       }
       setUser(userData)
