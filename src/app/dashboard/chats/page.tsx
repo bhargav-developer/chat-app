@@ -2,6 +2,7 @@
 
 import axios from 'axios'
 import { CircleXIcon, PlusIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 const Page = () => {
@@ -22,7 +23,7 @@ const Page = () => {
     useEffect(() => {
     if (query.length > 1) {
      const delayDebounce = setTimeout(async () => {
-      const res = await axios.post("api/profile/search-profile",{query});
+      const res = await axios.post("/api/profile/search-profile",{query});
       if(res.status === 200){
         const data = res.data.Users
         setContacts(data)
@@ -35,6 +36,8 @@ const Page = () => {
     }
   }, [query])
 
+
+  const router = useRouter();
 
 
 
@@ -95,7 +98,9 @@ const Page = () => {
               {
                 contacts &&
                     contacts.map((e,index) => {
-                  return <div key={index} className='flex gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-2xl mx-6 my-2'>
+                  return <div key={index} onClick={() => {
+                    router.push(`chats/${e._id}`)
+                  }} className='flex gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-2xl mx-6 my-2'>
                       <img src={e.avatar} alt=":(" className='w-11 h-11' />
                       <div className=''>
                         <h1 className='font-bold'>{e.firstName}</h1>
