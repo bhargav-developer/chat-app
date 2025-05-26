@@ -1,10 +1,12 @@
 "use client"
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import Link from "next/link";
 import { useUserStore } from "@/lib/userStore";
 import User from "@/Models/user";
 import { HouseIcon,UserIcon,MessageSquareText, UsersIcon, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -61,7 +63,31 @@ const currentLinks = [
 ]
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-const {user} = useUserStore();
+const {user,setUser} = useUserStore();
+ const router = useRouter();
+
+  useEffect(()=>{
+    getUserInfo()
+  },[])
+
+  const getUserInfo = async () => {
+     try {
+      const res = await axios.get("/api/auth/me",{withCredentials: true});
+      const {_id,firstName,lastName,email,avatar} = res.data.user;
+      const userData = {
+        id: _id,
+        email,
+        name: `${firstName} ${lastName}`,
+        avatar
+      }
+      setUser(userData)
+    } catch (error: any) {
+      console.log(error)
+      if(error.status == 401){
+        router.push("/login")
+      }
+    }
+  }
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
