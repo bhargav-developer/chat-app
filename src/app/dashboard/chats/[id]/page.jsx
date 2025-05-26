@@ -43,7 +43,7 @@ function page({ params }) {
       <div className='bg-gray-50 flex-1 flex'>
       </div>
 
-      <div className='border-t p-3 gap-3 mb-5 flex  border-gray-100 items-center w-full'>
+      <div className='border-t p-3 gap-3 mb-2 flex  border-gray-100 items-center w-full'>
 <button><Link2Icon/></button>
 <input type="text" className='border border-gray-400 flex-1 p-2 rounded-xl' placeholder='Type Your Message' />
 <button><SmileIcon/></button>

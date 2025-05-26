@@ -74,7 +74,6 @@ const {user,setUser} = useUserStore();
 useEffect(() => {
   if(user){
     const socket = useSocket(user.id)
-    console.log(user.id)
 
   }
 }, [user]);
