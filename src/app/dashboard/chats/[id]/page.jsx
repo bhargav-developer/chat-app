@@ -8,17 +8,21 @@ function page({ params }) {
   const { id } = React.use(params)
   const [user, setUser] = React.useState({})
   const [message, setMessage] = React.useState("")
-  const userId = user.id
+  const [messages, setMessages] = React.useState([])
+  const userId = user._id
   const socketRef = useSocket(userId)
-  let socket
+  const socket = React.useRef(null)
 
   React.useEffect(() => {
     if(!socketRef.current){
       return
     }
 
-    socket = socketRef.current;
+    socket.current = socketRef.current;
 
+    socket.current.on("recieve-message",(msg)=>{
+      setMessages([msg])
+    })
 
   }, [socketRef])
 
@@ -26,8 +30,10 @@ function page({ params }) {
     getUserInfo()
   }, [])
 
-  const sendMessage = () => {
-      socket.emit("test-case")
+  const sendMessage = async () => {
+    if(socket.current){
+      socketRef.current.emit("message",{content: message,to: user._id})
+    }
   }
 
   const getUserInfo = async () => {
@@ -57,7 +63,11 @@ function page({ params }) {
           <h1>op</h1>
         </div>
       </div>
-
+  {messages.map((msg, index) => (
+    <div key={index} className="bg-gray-200 p-2 rounded-xl w-fit">
+      {msg.content || msg}
+    </div>
+  ))}
       <div className='bg-gray-50 flex-1 flex'>
       </div>
 
@@ -67,7 +77,7 @@ function page({ params }) {
   setMessage(e.target.value)
 }} className='border border-gray-400 flex-1 p-2 rounded-xl' placeholder='Type Your Message' />
 <button><SmileIcon/></button>
-<button className='bg-indigo-600 p-3 cursor-pointer rounded-2xl'onClick={sendMessage} ><SendHorizontalIcon className='text-white'/></button>
+<button className='bg-indigo-600 p-3 cursor-pointer rounded-2xl' onClick={sendMessage}><SendHorizontalIcon className='text-white'/></button>
 
       </div>
 

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"next dev\" \"node socket-server/index.js\"",
+    "dev": "concurrently \"next dev\" \"nodemon socket-server/index.js\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -20,6 +20,7 @@
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.2",
     "next": "15.3.0",
+    "nodemon": "^3.1.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",

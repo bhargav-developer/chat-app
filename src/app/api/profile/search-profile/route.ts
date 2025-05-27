@@ -16,8 +16,6 @@ export async function POST(req: NextRequest){
         { phone: word },
       ],
         }).limit(3).select("email avatar firstName ")
-
-        console.log(Users)
         
         return NextResponse.json({message:"Hello",Users},{status: 200})
     }catch(err){
