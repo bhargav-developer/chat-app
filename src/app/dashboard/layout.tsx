@@ -7,7 +7,7 @@ import { HouseIcon,UserIcon,MessageSquareText, UsersIcon, Settings } from "lucid
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import {useSocket} from '@/app/hooks/socketContext.js'
+import {useSocket} from '@/app/hooks/socketContext.jsx'
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -71,12 +71,7 @@ const {user,setUser} = useUserStore();
     getUserInfo()
   },[])
 
-useEffect(() => {
-  if(user){
-    const socket = useSocket(user.id)
 
-  }
-}, [user]);
 
   const getUserInfo = async () => {
      try {

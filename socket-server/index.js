@@ -7,4 +7,10 @@ const io = require("socket.io")(4000, {
 
 io.on("connection", (socket) => {
   console.log("Client connected", socket.id);
+
+  socket.on("join",(userId) => {
+    socket.join(userId)
+    console.log("User joined the room ",userId)
+  })
+
 });

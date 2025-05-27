@@ -1,4 +1,5 @@
 'use client'
+import { useSocket } from '@/app/hooks/socketContext'
 import axios from 'axios'
 import { Link2Icon, SendHorizontalIcon, SmileIcon } from 'lucide-react'
 import * as React from 'react'
@@ -6,16 +7,33 @@ import * as React from 'react'
 function page({ params }) {
   const { id } = React.use(params)
   const [user, setUser] = React.useState({})
+  const [message, setMessage] = React.useState("")
+  const userId = user.id
+  const socketRef = useSocket(userId)
+  let socket
+
+  React.useEffect(() => {
+    if(!socketRef.current){
+      return
+    }
+
+    socket = socketRef.current;
+
+
+  }, [socketRef])
 
   React.useEffect(() => {
     getUserInfo()
   }, [])
 
+  const sendMessage = () => {
+      socket.emit("test-case")
+  }
+
   const getUserInfo = async () => {
     const res = await axios.post("/api/profile/getSingleProfile", { userId: id })
     if (res.status === 200) {
       const user = res.data.Users;
-
       setUser(user)
     }
   }
@@ -45,9 +63,11 @@ function page({ params }) {
 
       <div className='border-t p-3 gap-3 mb-2 flex  border-gray-100 items-center w-full'>
 <button><Link2Icon/></button>
-<input type="text" className='border border-gray-400 flex-1 p-2 rounded-xl' placeholder='Type Your Message' />
+<input type="text" value={message} onChange={(e) => {
+  setMessage(e.target.value)
+}} className='border border-gray-400 flex-1 p-2 rounded-xl' placeholder='Type Your Message' />
 <button><SmileIcon/></button>
-<button className='bg-indigo-600 p-3 cursor-pointer rounded-2xl'><SendHorizontalIcon className='text-white'/></button>
+<button className='bg-indigo-600 p-3 cursor-pointer rounded-2xl'onClick={sendMessage} ><SendHorizontalIcon className='text-white'/></button>
 
       </div>
 
