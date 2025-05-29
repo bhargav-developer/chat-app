@@ -33,14 +33,40 @@ function page({ params }) {
   //   };
   // }, []);
 
+  const getMessages = async () => {
+    try {
+      const res = await axios.get('http://localhost:4000/messages',{
+        params:{
+          from: user.id,
+          to: User._id
+        }
+      })
+
+      console.log("yes")
+
+      setMessages(res.data.messages)
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   React.useEffect(() => {
     getUserInfo()
   }, [])
+
+
+
+  React.useEffect(() => {
+  if(user?.id && User?._id){
+    getMessages()
+  }
+  }, [User,user])
+
   React.useEffect(() => {
     if (!socket) return;
 
     const handleMessage = (msg) => {
-      console.log("got a msg", msg);
       setMessages((e) => [...e, msg]);
     };
 
@@ -87,17 +113,21 @@ function page({ params }) {
           <h1>op</h1>
         </div>
       </div>
+      <div className='bg-gray-50 flex-1 gap-3 text-white px-4 flex-col flex'>
+
       {messages.map((msg, index) => (
         <div
           key={index}
           className={`flex ${msg.from === user.id ? 'justify-end' : 'justify-start'}`}
         >
-          <div className="bg-indigo-100 p-2 rounded-xl max-w-xs">
+          {msg.from !== user.id && 
+          <img className='h-8 w-8' src={User?.avatar} alt="" />
+          }
+          <div className={`p-3 ${msg.from === user.id ? 'bg-blue-600 rounded-2xl rounded-tr-md' : 'border border-gray-200 rounded-2xl rounded-tl-md text-black'} rounded-xl max-w-xs`}>
             {msg.content || msg}
           </div>
         </div>
       ))}
-      <div className='bg-gray-50 flex-1 flex'>
       </div>
 
       <div className='border-t p-3 gap-3 mb-2 flex  border-gray-100 items-center w-full'>
