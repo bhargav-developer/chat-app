@@ -33,7 +33,7 @@ const page = () => {
     })
     if(res.status === 200){
       toast.success("U are Loggedin")
-      router.push("/")
+      router.push("/dashboard")
       
     }
   }catch(err: any){

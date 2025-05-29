@@ -3,7 +3,8 @@ import { useSocket } from '@/app/hooks/socketContext'
 import { useSocketStore } from '@/lib/socketStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
-import { Link2Icon, SendHorizontalIcon, SmileIcon } from 'lucide-react'
+import { ArrowLeftCircleIcon, Link2Icon, SendHorizontalIcon, SmileIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import * as React from 'react'
 
 function page({ params }) {
@@ -12,7 +13,7 @@ function page({ params }) {
   const [User, setUser] = React.useState({})
   const [message, setMessage] = React.useState("")
   const [messages, setMessages] = React.useState([])
-  const userId = User._id
+  const router = useRouter();
   const socket = useSocketStore((state) => state.socket);
 
   //  React.useEffect(() => {
@@ -96,8 +97,15 @@ function page({ params }) {
 
   return <>
     <div className='flex h-full flex-col'>
+      
       <div className='flex p-4 border-b border-gray-100 justify-between'>
+      
         <div className='flex gap-3'>
+            <div onClick={()=>{
+              router.back()
+            }} className='flex cursor-pointer justify-center items-center'>
+          <ArrowLeftCircleIcon className='text-indigo-500'/>
+        </div>
           <div className='relative'>
             <img className='h-12 w-12' src={User?.avatar} alt="" />
             <div className='bg-green-500 absolute bottom-1 right-[3px] border border-white rounded-[50%] h-3 w-3'></div>
@@ -113,7 +121,7 @@ function page({ params }) {
           <h1>op</h1>
         </div>
       </div>
-      <div className='bg-gray-50 flex-1 gap-3 text-white px-4 flex-col flex'>
+      <div className='bg-gray-50 pt-2 flex-1 gap-3 text-white px-4 flex-col flex'>
 
       {messages.map((msg, index) => (
         <div
