@@ -1,5 +1,4 @@
 'use client'
-import { useSocket } from '@/app/hooks/socketContext'
 import { useSocketStore } from '@/lib/socketStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
@@ -15,24 +14,12 @@ function page({ params }) {
   const [messages, setMessages] = React.useState([])
   const router = useRouter();
   const socket = useSocketStore((state) => state.socket);
+  const messagesEndRef = React.useRef(null);
 
-  //  React.useEffect(() => {
-  //   if (!socketRef.current) return;
+  React.useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+}, [messages]);
 
-  //   socket.current = socketRef.current;
-
-  //   const handleReceiveMessage = (msg) => {
-  //     setMessages((prev) => [...prev, msg]);
-  //     console.log("Received message:", msg);
-  //   };
-
-  //   // IMPORTANT: use the correct event name
-  //   socket.current.on("receive-message", handleReceiveMessage);
-
-  //   return () => {
-  //     socket.current.off("receive-message", handleReceiveMessage);
-  //   };
-  // }, []);
 
   const getMessages = async () => {
     try {
@@ -121,22 +108,23 @@ function page({ params }) {
           <h1>op</h1>
         </div>
       </div>
-      <div className='bg-gray-50 pt-2 flex-1 gap-3 text-white px-4 flex-col flex'>
-
-      {messages.map((msg, index) => (
-        <div
-          key={index}
-          className={`flex ${msg.from === user.id ? 'justify-end' : 'justify-start'}`}
-        >
-          {msg.from !== user.id && 
-          <img className='h-8 w-8' src={User?.avatar} alt="" />
-          }
-          <div className={`p-3 ${msg.from === user.id ? 'bg-blue-600 rounded-2xl rounded-tr-md' : 'border border-gray-200 rounded-2xl rounded-tl-md text-black'} rounded-xl max-w-xs`}>
-            {msg.content || msg}
-          </div>
-        </div>
-      ))}
+<div className='bg-gray-50 overflow-auto pt-2 flex-1 gap-3 text-white px-4 flex-col flex'>
+  {messages.map((msg, index) => (
+    <div
+      key={index}
+      className={`flex ${msg.from === user.id ? 'justify-end' : 'justify-start'}`}
+    >
+      {msg.from !== user.id && 
+        <img className='h-8 w-8' src={User?.avatar} alt="" />
+      }
+      <div className={`p-3 ${msg.from === user.id ? 'bg-blue-600 rounded-2xl rounded-tr-md' : 'border border-gray-200 rounded-2xl rounded-tl-md text-black'} rounded-xl max-w-xs`}>
+        {msg.content || msg}
       </div>
+    </div>
+  ))}
+  <div ref={messagesEndRef} />
+</div>
+
 
       <div className='border-t p-3 gap-3 mb-2 flex  border-gray-100 items-center w-full'>
         <button><Link2Icon /></button>

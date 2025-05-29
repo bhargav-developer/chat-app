@@ -2,13 +2,11 @@
 import { FC, ReactNode, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useUserStore } from "@/lib/userStore";
-import User from "@/Models/user";
 import { HouseIcon, UserIcon, MessageSquareText, UsersIcon, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { useSocket } from '@/app/hooks/socketContext.jsx'
-import { useSocketStore } from "@/lib/socketStore";
+import { useSocket } from "../hooks/socketContext";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -67,15 +65,15 @@ const currentLinks = [
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, setUser } = useUserStore();
   const router = useRouter();
-  useSocket(user?.id) 
-  
 
   
-
-
+  
   useEffect(() => {
     getUserInfo()
   }, [])
+  
+  useSocket(user?.id || "");
+
 
 
 

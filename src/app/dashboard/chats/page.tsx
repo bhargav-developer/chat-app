@@ -1,5 +1,6 @@
 'use client'
 
+import { useSocketStore } from '@/lib/socketStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
 import { CircleXIcon, PlusIcon } from 'lucide-react'
@@ -19,8 +20,8 @@ interface Chat {
 const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [showModal, setShowModal] = useState<boolean>(false)
-
   const [chats, setChats] = useState<Chat[]>([]);
+  const socket = useSocketStore((state) => state.socket);
 
   interface userI {
     _id: Number,
@@ -35,23 +36,8 @@ const Page = () => {
 
   const [query, setQuery] = useState<string>("")
 
-  useEffect(() => {
-    if (user?.id) {
-      findRecentChats()
-      console.log("sent req")
-    }
-  }, [user])
 
-  const findRecentChats = async () => {
-    const res = await axios.get("http://localhost:4000/chats", {
-      params: {
-        userId: user?.id
-      }
-    })
-    console.log(res)
-    const data = res.data;
-    setChats(data)
-  }
+ 
 
   useEffect(() => {
     if (query.length > 1) {
@@ -69,8 +55,41 @@ const Page = () => {
     }
   }, [query])
 
+  useEffect(()=>{
+    if(user){
+      findRecentChats();
+    }
+  })
+
 
   const router = useRouter();
+
+   useEffect(() => {
+  if (!socket) return;
+
+  const handleMessage = (data: { senderId: string; content: string; timestamp: string }) => {
+    console.log("Received message:", data);
+    findRecentChats();
+  };
+
+  socket.on('receive-message', handleMessage);
+
+  return () => {
+    socket.off('receive-message', handleMessage);
+  };
+}, [socket]);
+
+ const findRecentChats = async () => {
+    const res = await axios.get("http://localhost:4000/chats", {
+      params: {
+        userId: user?.id
+      }
+    })
+    console.log(res)
+    const data = res.data;
+    setChats(data)
+  }
+
 
 
 
