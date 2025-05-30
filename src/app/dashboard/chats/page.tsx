@@ -1,5 +1,6 @@
 'use client'
 
+import Avatar from '@/Components/Avatar'
 import { useSocketStore } from '@/lib/socketStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
@@ -59,7 +60,7 @@ const Page = () => {
     if(user){
       findRecentChats();
     }
-  })
+  },[socket])
 
 
   const router = useRouter();
@@ -85,7 +86,6 @@ const Page = () => {
         userId: user?.id
       }
     })
-    console.log(res)
     const data = res.data;
     setChats(data)
   }
@@ -130,11 +130,7 @@ const Page = () => {
       onClick={() => router.push(`./chats/${e.userId}`)}
     >
       <div className='flex justify-center items-center'>
-        <img
-          src={e.avatar}
-          alt={e.firstName}
-          className='w-12 h-12 rounded-full object-cover'
-        />
+     <Avatar avatarUrl={e.avatar} />
       </div>
       <div className='flex justify-center px-2 items-center flex-col text-left ml-4'>
         <h1 className='font-bold w-full'>{e.firstName}</h1>
