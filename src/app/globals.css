@@ -5,6 +5,13 @@
   --foreground: #171717;
 }
 
+html,
+body,
+#__next {
+  height: 100%;
+}
+
+
 
 @theme inline {
   --color-background: var(--background);

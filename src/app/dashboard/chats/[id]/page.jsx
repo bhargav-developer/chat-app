@@ -20,9 +20,15 @@ function page({ params }) {
    const [isOpen, setIsOpen] = React.useState(false);
 
   const handleDeleteClick = () => setIsOpen(true);
-  const handleConfirmDelete = () => {
-    onDelete();
-    setIsOpen(false);
+  const handleConfirmDelete = async () => {
+    const res = await axios.delete("http://localhost:4000/messages",{
+      params: {from: user.id}
+    })
+    if(res.data){
+      setIsOpen(false);
+      setMessages([])
+    }
+
   };
   const handleCancel = () => setIsOpen(false);
 

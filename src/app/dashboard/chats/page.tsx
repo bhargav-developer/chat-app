@@ -86,6 +86,7 @@ const Page = () => {
         userId: user?.id
       }
     })
+    console.log("sent req")
     const data = res.data;
     setChats(data)
   }
@@ -122,23 +123,26 @@ const Page = () => {
       </div>
 
 
-{
-  chats && chats.map((e, index) => (
-    <div
-      key={index}
-      className='flex p-5 border-b hover:bg-indigo-100 hover:cursor-pointer border-gray-100'
-      onClick={() => router.push(`./chats/${e.userId}`)}
-    >
-      <div className='flex justify-center items-center'>
-     <Avatar avatarUrl={e.avatar} />
-      </div>
-      <div className='flex justify-center px-2 items-center flex-col text-left ml-4'>
-        <h1 className='font-bold w-full'>{e.firstName}</h1>
-        <p className='text-gray-500 text-sm w-full truncate'>{e.lastMessage}</p>
-      </div>
+{chats && chats.map((chat, index) => (
+  <div
+    key={chat.userId || index}  // Prefer a unique ID over index if available
+    className="flex p-5 border-b hover:bg-indigo-100 cursor-pointer border-gray-100"
+    onClick={() => router.push(`./chats/${chat.userId}`)}
+  >
+    <div className="flex justify-center items-center">
+      <Avatar avatarUrl={chat.avatar} />
     </div>
-  ))
-}
+    <div className="flex flex-col justify-center px-2 ml-4 text-left">
+      <h1 className="font-bold w-full">
+        {chat.firstName} {chat.userId === user?.id && "(you)"}
+      </h1>
+      <p className="text-gray-500 text-sm w-full truncate">
+        {chat.lastMessage}
+      </p>
+    </div>
+  </div>
+))}
+
 
 
     
