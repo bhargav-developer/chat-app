@@ -1,4 +1,5 @@
 'use client'
+import Avatar from '@/Components/Avatar'
 import { useSocketStore } from '@/lib/socketStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
@@ -116,8 +117,8 @@ function page({ params }) {
             <ArrowLeftCircleIcon className="text-indigo-500" />
           </div>
           <div className="relative">
-            <img className="h-12 w-12" src={User.avatar} alt="" />
-            <div className="bg-green-500 absolute bottom-1 right-[3px] border border-white rounded-[50%] h-3 w-3"></div>
+           <Avatar avatarUrl={User.avatar} />
+           
           </div>
           <div>
             <h1>{`${User.firstName} ${User.lastName}`}</h1>

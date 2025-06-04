@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface prop {
-    avatarUrl: string,
+    avatarUrl: string | undefined,
     altTitle?: string,
     isOnline?: boolean
 }
