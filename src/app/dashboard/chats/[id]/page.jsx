@@ -1,5 +1,6 @@
 'use client'
 import Avatar from '@/Components/Avatar'
+import EmojiPickerComponent from '@/Components/EmojiPicker'
 import { useSocketStore } from '@/lib/socketStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
@@ -16,16 +17,17 @@ function page({ params }) {
   const router = useRouter();
   const socket = useSocketStore((state) => state.socket);
   const messagesEndRef = React.useRef(null);
+  const [showPicker, setShowPicker] = React.useState(false);
 
 
-   const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const handleDeleteClick = () => setIsOpen(true);
   const handleConfirmDelete = async () => {
-    const res = await axios.delete("http://localhost:4000/messages",{
-      params: {from: user.id}
+    const res = await axios.delete("http://localhost:4000/messages", {
+      params: { from: user.id }
     })
-    if(res.data){
+    if (res.data) {
       setIsOpen(false);
       setMessages([])
     }
@@ -117,8 +119,8 @@ function page({ params }) {
             <ArrowLeftCircleIcon className="text-indigo-500" />
           </div>
           <div className="relative">
-           <Avatar avatarUrl={User.avatar} />
-           
+            <Avatar avatarUrl={User.avatar} />
+
           </div>
           <div>
             <h1>{`${User.firstName} ${User.lastName}`}</h1>
@@ -128,7 +130,7 @@ function page({ params }) {
         <div className="flex gap-2 justify-between items-centers">
           <h1>op</h1>
           <h1>op</h1>
-        <Trash2Icon className='hover:text-indigo-500 cursor-pointer' onClick={handleDeleteClick} />
+          <Trash2Icon className='hover:text-indigo-500 cursor-pointer' onClick={handleDeleteClick} />
         </div>
       </div>
 
@@ -143,11 +145,10 @@ function page({ params }) {
               <img className="h-8 w-8" src={User.avatar} alt="" />
             )}
             <div
-              className={`p-3 ${
-                msg.from === user.id
+              className={`p-3 ${msg.from === user.id
                   ? "bg-blue-600 rounded-2xl rounded-tr-md"
                   : "border border-gray-200 rounded-2xl rounded-tl-md text-black"
-              } max-w-xs`}
+                } max-w-xs`}
             >
               {msg.content || msg}
             </div>
@@ -155,6 +156,7 @@ function page({ params }) {
         ))}
         <div ref={messagesEndRef} />
       </div>
+      
 
       {/* Input */}
       <div className="border-t p-3 gap-3 mb-2 flex border-gray-100 items-center w-full">
@@ -168,7 +170,7 @@ function page({ params }) {
           className="border border-gray-400 flex-1 p-2 rounded-xl"
           placeholder="Type Your Message"
         />
-        <button>
+        <button className='cursor-pointer' onClick={() => setShowPicker(!showPicker)}>
           <SmileIcon />
         </button>
         <button
@@ -178,6 +180,15 @@ function page({ params }) {
           <SendHorizontalIcon className="text-white" />
         </button>
       </div>
+
+ <div className='absolute bottom-0 right-0' onMouseLeave={() => setShowPicker(false)}>
+         {showPicker && (
+        <EmojiPickerComponent 
+          onEmojiClick={(emoji) => setMessage((prev) => prev + emoji)}
+        />
+      )}
+      </div>
+     
 
 
       {isOpen && (
@@ -202,11 +213,12 @@ function page({ params }) {
           </div>
         </div>
       )}
+
     </div>
 
 
 
-    
+
   );
 }
 
