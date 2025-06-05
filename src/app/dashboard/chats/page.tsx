@@ -8,7 +8,6 @@ import { CircleXIcon, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
-
 interface Chat {
   userId: string;
   firstName: string;
@@ -81,7 +80,7 @@ const Page = () => {
 }, [socket]);
 
  const findRecentChats = async () => {
-    const res = await axios.get("http://localhost:4000/chats", {
+    const res = await axios.get("http://localhost:4000/messages/chats", {
       params: {
         userId: user?.id
       }
