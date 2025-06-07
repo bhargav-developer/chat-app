@@ -1,9 +1,11 @@
 "use client"
+import { useUserStore } from "@/lib/userStore";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
 const UserProfile: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
+  const { setUser } = useUserStore()
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -41,10 +43,19 @@ const UserProfile: React.FC = () => {
     setIsEditing(!isEditing);
   };
 
-  const UpdateProfile = async () =>{
-    const res = await axios.post("/api/profile/updateProfile",{formData},{withCredentials: true});
-    if(res.data){
+  const UpdateProfile = async () => {
+    const res = await axios.post("/api/profile/updateProfile", { formData }, { withCredentials: true });
+    if (res.data) {
+      const data = res.data 
       setUserData(res.data)
+      const userData = {
+        id: data._id,
+        name: data.firstName +" "+ data.lastName,
+        email: data.email,
+        avatar: data.avatar,
+      }
+      setUser(userData)
+
     }
   }
 
@@ -70,8 +81,8 @@ const UserProfile: React.FC = () => {
               </button>
               <button
                 onClick={() => {
-                UpdateProfile()
-                  setIsEditing(false); 
+                  UpdateProfile()
+                  setIsEditing(false);
                 }}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition duration-200"
               >

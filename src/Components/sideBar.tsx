@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   HouseIcon,
   UserIcon,
