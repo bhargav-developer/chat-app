@@ -47,7 +47,7 @@ const Page = () => {
           const data = res.data.Users
           setContacts(data)
         }
-      }, 0);
+      }, 300);
 
       return () => clearTimeout(delayDebounce);
     } else {

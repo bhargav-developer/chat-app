@@ -18,8 +18,8 @@ function page({ params }) {
   const socket = useSocketStore((state) => state.socket);
   const messagesEndRef = React.useRef(null);
   const [showPicker, setShowPicker] = React.useState(false);
-
-
+  const [file, setFile] = React.useState(null);
+    const fileInputRef = React.useRef(null);
   const [isOpen, setIsOpen] = React.useState(false);
 
   const handleDeleteClick = () => setIsOpen(true);
@@ -34,6 +34,19 @@ function page({ params }) {
 
   };
   const handleCancel = () => setIsOpen(false);
+
+  
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      console.log('Selected file:', file.name);
+
+    }
+  };
+
+  const openFileDialog = () => {
+fileInputRef.current.click();
+  };
 
   // Scroll effect
   React.useEffect(() => {
@@ -102,7 +115,7 @@ function page({ params }) {
     }
   };
 
-  // 🔐 Wait until both user and User are loaded
+
   if (!user?.id || !User?._id) {
     return <div className="p-4">Loading chat...</div>;
   }
@@ -128,8 +141,6 @@ function page({ params }) {
           </div>
         </div>
         <div className="flex gap-2 justify-between items-centers">
-          <h1>op</h1>
-          <h1>op</h1>
           <Trash2Icon className='hover:text-indigo-500 cursor-pointer' onClick={handleDeleteClick} />
         </div>
       </div>
@@ -159,10 +170,20 @@ function page({ params }) {
       
 
       {/* Input */}
-      <div className="border-t p-3 gap-3 mb-2 flex border-gray-100 items-center w-full">
-        <button>
-          <Link2Icon />
-        </button>
+      <div className="border-t relative p-3 gap-3 mb-2 flex border-gray-100 items-center w-full">
+          <button
+      type="button"
+      className="cursor-pointer p-2"
+      onClick={openFileDialog}
+    >
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
+      <Link2Icon />
+    </button>
         <input
           type="text"
           value={message}
