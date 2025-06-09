@@ -18,8 +18,7 @@ function page({ params }) {
   const router = useRouter();
   const socket = useSocketStore((state) => state.socket);
   const messagesEndRef = React.useRef(null);
-  const [showPicker, setShowPicker] = React.useState(false);
-  const [file, setFile] = React.useState(null);
+  const [showPicker, setShowPicker] = React.useState(false);;
   const [upload, setUplaod] = React.useState(false);
   const fileInputRef = React.useRef(null);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -238,7 +237,7 @@ function page({ params }) {
       )}
 
       {
-        upload && <FileUpload/>
+        upload && <FileUpload onClose={() => setUplaod(false)}/>
 
       }
 
