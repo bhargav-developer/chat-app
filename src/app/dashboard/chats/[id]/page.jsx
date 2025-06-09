@@ -1,6 +1,7 @@
 'use client'
 import Avatar from '@/Components/Avatar'
 import EmojiPickerComponent from '@/Components/EmojiPicker'
+import FileUpload from '@/Components/FileUpload'
 import { useSocketStore } from '@/lib/socketStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
@@ -19,7 +20,8 @@ function page({ params }) {
   const messagesEndRef = React.useRef(null);
   const [showPicker, setShowPicker] = React.useState(false);
   const [file, setFile] = React.useState(null);
-    const fileInputRef = React.useRef(null);
+  const [upload, setUplaod] = React.useState(false);
+  const fileInputRef = React.useRef(null);
   const [isOpen, setIsOpen] = React.useState(false);
 
   const handleDeleteClick = () => setIsOpen(true);
@@ -35,17 +37,17 @@ function page({ params }) {
   };
   const handleCancel = () => setIsOpen(false);
 
-  
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      console.log('Selected file:', file.name);
+      console.log('Selected file:', file);
+      setFile(file)
 
     }
   };
 
   const openFileDialog = () => {
-fileInputRef.current.click();
+    fileInputRef.current.click();
   };
 
   // Scroll effect
@@ -157,8 +159,8 @@ fileInputRef.current.click();
             )}
             <div
               className={`p-3 ${msg.from === user.id
-                  ? "bg-blue-600 rounded-2xl rounded-tr-md"
-                  : "border border-gray-200 rounded-2xl rounded-tl-md text-black"
+                ? "bg-blue-600 rounded-2xl rounded-tr-md"
+                : "border border-gray-200 rounded-2xl rounded-tl-md text-black"
                 } max-w-xs`}
             >
               {msg.content || msg}
@@ -167,23 +169,23 @@ fileInputRef.current.click();
         ))}
         <div ref={messagesEndRef} />
       </div>
-      
+
 
       {/* Input */}
       <div className="border-t relative p-3 gap-3 mb-2 flex border-gray-100 items-center w-full">
-          <button
-      type="button"
-      className="cursor-pointer p-2"
-      onClick={openFileDialog}
-    >
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        style={{ display: 'none' }}
-      />
-      <Link2Icon />
-    </button>
+        <button
+          type="button"
+          className="cursor-pointer p-2"
+          onClick={() => setUplaod(true)}
+        >
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
+          <Link2Icon />
+        </button>
         <input
           type="text"
           value={message}
@@ -202,14 +204,14 @@ fileInputRef.current.click();
         </button>
       </div>
 
- <div className='absolute bottom-0 right-0' onMouseLeave={() => setShowPicker(false)}>
-         {showPicker && (
-        <EmojiPickerComponent 
-          onEmojiClick={(emoji) => setMessage((prev) => prev + emoji)}
-        />
-      )}
+      <div className='absolute bottom-0 right-0' onMouseLeave={() => setShowPicker(false)}>
+        {showPicker && (
+          <EmojiPickerComponent
+            onEmojiClick={(emoji) => setMessage((prev) => prev + emoji)}
+          />
+        )}
       </div>
-     
+
 
 
       {isOpen && (
@@ -234,6 +236,11 @@ fileInputRef.current.click();
           </div>
         </div>
       )}
+
+      {
+        upload && <FileUpload/>
+
+      }
 
     </div>
 
