@@ -55,17 +55,17 @@ const ReqPopUp: React.FC<Props> = ({ sender, timeout = 10, onAccept, onReject })
           Incoming file transfer from <span className="font-semibold">{sender}</span>
         </p>
         <div className="flex justify-center space-x-4">
+             <button
+            onClick={onReject}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+          >
+            Reject
+          </button>
           <button
             onClick={onAccept}
             className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
           >
             Accept
-          </button>
-          <button
-            onClick={onReject}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-          >
-            Reject
           </button>
         </div>
       </div>

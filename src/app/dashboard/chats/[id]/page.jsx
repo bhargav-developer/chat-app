@@ -24,7 +24,7 @@ function page({ params }) {
   const [upload, setUplaod] = React.useState(false);
   const [recieve, setRecieve] = React.useState(false);
   const [recieveReq, setRecieveReq] = React.useState(false);
-   const [recieverName, setRecieveName] = React.useState(null);
+  const [recieverName, setRecieveName] = React.useState(null);
   const fileInputRef = React.useRef(null);
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -39,20 +39,7 @@ function page({ params }) {
     }
 
   };
-  const handleCancel = () => setIsOpen(false);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      console.log('Selected file:', file);
-      setFile(file)
-
-    }
-  };
-
-  const openFileDialog = () => {
-    fileInputRef.current.click();
-  };
 
   // Scroll effect
   React.useEffect(() => {
@@ -74,17 +61,23 @@ function page({ params }) {
       setMessages((prev) => [...prev, msg]);
     };
 
-     const handleFileTransferReq = (msg) => {
-       if(msg.sender){
-         setRecieveName(msg.sender)
-         setRecieveReq(true)
-        }
+    const handleFileTransferReq = (msg) => {
+      if (msg.sender) {
+        setRecieveName(msg.sender)
+        setRecieveReq(true)
+      }
     };
 
+
+    socket.on("file-transfer", () => {
+      setUplaod(true)
+    })
+
     socket.on("receive-message", handleMessage);
-     socket.on("file-transfer-request", handleFileTransferReq);
+    socket.on("file-transfer-request", handleFileTransferReq);
     return () => {
       socket.off("receive-message", handleMessage);
+      socket.off("file-transfer-request", handleFileTransferReq);
     };
   }, [socket]);
 
@@ -105,14 +98,14 @@ function page({ params }) {
   }, []);
 
   const handleFileSender = async () => {
-    try{
-      const res = socket.emit("file-transfer-request",{
+    try {
+      const res = socket.emit("file-transfer-request", {
         sender: user.id,
         reciever: User._id,
         name: user.name
       })
       console.log(res)
-    }catch(err){
+    } catch (err) {
       console.log(err)
     }
   }
@@ -130,6 +123,22 @@ function page({ params }) {
       console.log(error);
     }
   };
+
+  const handleReqAccept = async () => {
+    try {
+      setRecieve(true)
+      setRecieveReq(false)
+      socket.emit("accept-file-transfer", {
+        from: User._id
+      })
+
+    } catch (error) {
+      console.log(err)
+    }
+  }
+
+
+
 
   const sendMessage = async () => {
     if (socket && message.trim()) {
@@ -235,10 +244,7 @@ function page({ params }) {
           <ReqPopUp
             sender={recieverName}
             timeout={10}
-            onAccept={() => {
-              setRecieve(true)
-              setRecieveReq(false)
-            }}
+            onAccept={handleReqAccept}
             onReject={() => setRecieveReq(false)}
           />
         </div>
@@ -269,7 +275,7 @@ function page({ params }) {
       )}
 
       {
-        upload && <FileUpload onClose={() => setUplaod(false)}/>
+        upload && <FileUpload onClose={() => setUplaod(false)} />
 
       }
       {
@@ -279,9 +285,6 @@ function page({ params }) {
 
 
     </div>
-
-
-
 
   );
 }
