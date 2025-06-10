@@ -23,6 +23,8 @@ function page({ params }) {
   const [showPicker, setShowPicker] = React.useState(false);;
   const [upload, setUplaod] = React.useState(false);
   const [recieve, setRecieve] = React.useState(false);
+  const [recieveReq, setRecieveReq] = React.useState(false);
+   const [recieverName, setRecieveName] = React.useState(null);
   const fileInputRef = React.useRef(null);
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -72,7 +74,15 @@ function page({ params }) {
       setMessages((prev) => [...prev, msg]);
     };
 
+     const handleFileTransferReq = (msg) => {
+       if(msg.sender){
+         setRecieveName(msg.sender)
+         setRecieveReq(true)
+        }
+    };
+
     socket.on("receive-message", handleMessage);
+     socket.on("file-transfer-request", handleFileTransferReq);
     return () => {
       socket.off("receive-message", handleMessage);
     };
@@ -93,6 +103,19 @@ function page({ params }) {
   React.useEffect(() => {
     getUserInfo();
   }, []);
+
+  const handleFileSender = async () => {
+    try{
+      const res = socket.emit("file-transfer-request",{
+        sender: user.id,
+        reciever: User._id,
+        name: user.name
+      })
+      console.log(res)
+    }catch(err){
+      console.log(err)
+    }
+  }
 
   const getMessages = async () => {
     try {
@@ -178,14 +201,8 @@ function page({ params }) {
         <button
           type="button"
           className="cursor-pointer p-2"
-          onClick={() => setUplaod(true)}
+          onClick={handleFileSender}
         >
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-          />
           <Link2Icon />
         </button>
         <input
@@ -213,19 +230,19 @@ function page({ params }) {
           />
         )}
       </div>
-{ upload &&
-<div className='absolute h-full w-full'>
-     <ReqPopUp
-        sender="BOB"
-        timeout={10}
-        onAccept={() => {
-          setRecieve(true)
-          setUplaod(false)
-        }}
-        onReject={() => setUplaod(false)}
-/>
+      {recieveReq &&
+        <div className='absolute h-full w-full'>
+          <ReqPopUp
+            sender={recieverName}
+            timeout={10}
+            onAccept={() => {
+              setRecieve(true)
+              setRecieveReq(false)
+            }}
+            onReject={() => setRecieveReq(false)}
+          />
         </div>
-}
+      }
 
 
       {isOpen && (
@@ -251,12 +268,12 @@ function page({ params }) {
         </div>
       )}
 
-      {/* {
+      {
         upload && <FileUpload onClose={() => setUplaod(false)}/>
 
-      } */}
-          {
-        recieve && <FileRecieve onClose={() => setRecieve(false)}/>
+      }
+      {
+        recieve && <FileRecieve onClose={() => setRecieve(false)} />
 
       }
 
