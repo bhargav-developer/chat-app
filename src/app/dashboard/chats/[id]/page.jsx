@@ -1,7 +1,9 @@
 'use client'
 import Avatar from '@/Components/Avatar'
 import EmojiPickerComponent from '@/Components/EmojiPicker'
+import FileRecieve from '@/Components/FileRecieve'
 import FileUpload from '@/Components/FileUpload'
+import ReqPopUp from '@/Components/ReqPopUp'
 import { useSocketStore } from '@/lib/socketStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
@@ -20,6 +22,7 @@ function page({ params }) {
   const messagesEndRef = React.useRef(null);
   const [showPicker, setShowPicker] = React.useState(false);;
   const [upload, setUplaod] = React.useState(false);
+  const [recieve, setRecieve] = React.useState(false);
   const fileInputRef = React.useRef(null);
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -210,7 +213,19 @@ function page({ params }) {
           />
         )}
       </div>
-
+{ upload &&
+<div className='absolute h-full w-full'>
+     <ReqPopUp
+        sender="BOB"
+        timeout={10}
+        onAccept={() => {
+          setRecieve(true)
+          setUplaod(false)
+        }}
+        onReject={() => setUplaod(false)}
+/>
+        </div>
+}
 
 
       {isOpen && (
@@ -236,10 +251,15 @@ function page({ params }) {
         </div>
       )}
 
-      {
+      {/* {
         upload && <FileUpload onClose={() => setUplaod(false)}/>
 
+      } */}
+          {
+        recieve && <FileRecieve onClose={() => setRecieve(false)}/>
+
       }
+
 
     </div>
 
