@@ -1,28 +1,65 @@
+import { useSocketStore } from '@/lib/socketStore';
 import { FileIcon, TrashIcon, X } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface FileUploadProps {
   onClose: () => void;
 }
 
+interface FuckIt {
+    file: string;
+    size: number;
+}
 
-const FileRecieve:React.FC<FileUploadProps> = ({onClose}) => {
-     const [files, setFiles] = useState<File[]>([]);
+
+
+const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
+  const [files, setFiles] = useState<FuckIt[]>([]);
+  const socket = useSocketStore((state) => state.socket);
+
+  useEffect(() => {
+
+    if (!socket) return
+
+    socket.on("meta-transfer", (data) => {
+      setFiles(data)
+      console.log(data)
+    })
+
+    socket.on("recieve-file-chunk",(data)=>{
+        console.log("file chunk",data)
+    })
+
+    return () => {
+      socket.off("meta-transfer")
+    }
+  }, [socket])
+
+
+   const formatFileSize = (size: number) => {
+  const mb = size / 1_000_000;
+
+  
+  return `${mb.toFixed(2)} MB`;
+};
+
+
+
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white relative w-full max-w-4xl rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col md:flex-row gap-8">
 
-        
+
         {/* Close button */}
         <button
-        onClick={onClose}
+          onClick={onClose}
           className="absolute cursor-pointer top-[-30px] right-[-30px] text-white border border-white rounded transition-all hover:rounded-[50%]  duration-300 p-1"
         >
           <X
-           className="w-5 h-5" />
+            className="w-5 h-5" />
         </button>
 
-       
+
 
         {/* Uploaded Files */}
         <div className="flex-1 overflow-auto max-h-[400px]">
@@ -33,7 +70,7 @@ const FileRecieve:React.FC<FileUploadProps> = ({onClose}) => {
                 {files.length}
               </span>
             )}
-          </div> 
+          </div>
 
           <div className="space-y-4">
             {files.map((file, index) => (
@@ -44,14 +81,12 @@ const FileRecieve:React.FC<FileUploadProps> = ({onClose}) => {
                 <div className="flex items-center gap-3 overflow-hidden">
                   <FileIcon className="text-blue-500 w-8 h-8" />
                   <div className="truncate">
-                    <p className="font-medium truncate">{file.name}</p>
-                    {/* <p className="text-sm text-gray-500">{formatFileSize(file.size)}</p> */}
+                    <p className="font-medium truncate">{file.file}</p>
+                    <p className="text-sm text-gray-500">{formatFileSize(file.size)}</p>
                   </div>
                 </div>
                 <TrashIcon
-                  onClick={() =>
-                    setFiles((prev) => prev.filter((f) => f.name !== file.name))
-                  }
+                
                   className="w-5 h-5 text-red-500 hover:text-red-600 cursor-pointer transition"
                 />
               </div>

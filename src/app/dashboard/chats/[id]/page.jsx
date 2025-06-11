@@ -25,7 +25,6 @@ function page({ params }) {
   const [recieve, setRecieve] = React.useState(false);
   const [recieveReq, setRecieveReq] = React.useState(false);
   const [recieverName, setRecieveName] = React.useState(null);
-  const fileInputRef = React.useRef(null);
   const [isOpen, setIsOpen] = React.useState(false);
 
   const handleDeleteClick = () => setIsOpen(true);
@@ -71,6 +70,7 @@ function page({ params }) {
 
     socket.on("file-transfer", () => {
       setUplaod(true)
+      console.log("yes")
     })
 
     socket.on("receive-message", handleMessage);
@@ -275,7 +275,7 @@ function page({ params }) {
       )}
 
       {
-        upload && <FileUpload onClose={() => setUplaod(false)} />
+        upload && <FileUpload reciverId={User._id} onClose={() => setUplaod(false)} />
 
       }
       {

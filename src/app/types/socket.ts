@@ -5,6 +5,11 @@ export interface ServerToClientEvents {
     content: string;
     timestamp: string;
   }) => void;
+  'meta-transfer': (data: Array<{
+    file: string;
+    size: number;
+  }>) => void;
+   "recieve-file-chunk": (data: {}) => void;
 }
 
 export interface ClientToServerEvents {
@@ -12,6 +17,10 @@ export interface ClientToServerEvents {
     receiverId: string;
     content: string;
   }) => void;
+
+  "file-meta": (data: {name: string,size: number,reciverId: string}) => void;
+  "file-chunk": (data: {}) => void;
+  "file-end": (data: { name: string }) => void;
 
   'join': (userId: string) => void;
 }
