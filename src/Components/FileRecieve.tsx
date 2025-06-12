@@ -61,7 +61,6 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
 
 
 
-        {/* Uploaded Files */}
         <div className="flex-1 overflow-auto max-h-[400px]">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-lg md:text-xl">Recieved Files</h2>

@@ -110,6 +110,25 @@ function page({ params }) {
     }
   }
 
+ 
+ 
+  function formatAMPM(data) {
+  const date = new Date(data)
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+
+  // Convert from 24-hour to 12-hour
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+
+  // Pad minutes
+  minutes = String(minutes).padStart(2, '0');
+
+  return `${hours}:${minutes} ${ampm}`;
+}
+
+
   const getMessages = async () => {
     try {
       const res = await axios.get("http://localhost:4000/messages/getMessage", {
@@ -119,6 +138,7 @@ function page({ params }) {
         },
       });
       setMessages(res.data.messages);
+    
     } catch (error) {
       console.log(error);
     }
@@ -184,21 +204,25 @@ function page({ params }) {
       {/* Messages */}
       <div className="bg-gray-50 overflow-auto pt-2 flex-1 gap-3 text-white px-4 flex-col flex">
         {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`flex ${msg.from === user.id ? "justify-end" : "justify-start"}`}
-          >
-            {msg.from !== user.id && (
-              <img className="h-8 w-8" src={User.avatar} alt="" />
-            )}
+          <div      key={index}>
             <div
-              className={`p-3 ${msg.from === user.id
-                ? "bg-blue-600 rounded-2xl rounded-tr-md"
-                : "border border-gray-200 rounded-2xl rounded-tl-md text-black"
-                } max-w-xs`}
+              className={`flex ${msg.from === user.id ? "justify-end" : "justify-start"}`}
             >
-              {msg.content || msg}
+              {msg.from !== user.id && (
+                <img className="h-8 w-8" src={User.avatar} alt="" />
+              )}
+              <div
+                className={`p-3 ${msg.from === user.id
+                  ? "bg-blue-600 rounded-2xl rounded-tr-md"
+                  : "border border-gray-200 rounded-2xl rounded-tl-md text-black"
+                  } max-w-xs`}
+              >
+                {msg.content || msg}
+              </div>
             </div>
+              <p className={`text-gray-500 ${msg.from === user.id ? 'text-right' : 'text-left ml-10'} text-sm`}>
+                {formatAMPM(msg.timeStamp)}
+                </p>
           </div>
         ))}
         <div ref={messagesEndRef} />
