@@ -3,10 +3,8 @@ import React, { useEffect } from 'react'
 interface prop {
     avatarUrl: string | undefined,
     altTitle?: string,
-    isOnline?: boolean
+    isOnline?: boolean | Function
 }
-
-
 
 const Avatar: React.FC<prop> = ({ avatarUrl,
     altTitle,

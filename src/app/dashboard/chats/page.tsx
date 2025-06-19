@@ -66,7 +66,7 @@ const Page = () => {
 
 
   const router = useRouter();
-  const [onlineMap, setOnlineMap] = useState<Map<string, boolean>>(new Map());
+  const [onlineMap, setOnlineMap] = useState<Map<any,any>>(new Map());
 
 
   useEffect(() => {
@@ -81,7 +81,7 @@ const Page = () => {
     socket.on("update_users", (data) => {
       const map = new Map(Object.entries(data));
       setOnlineMap(map);
-
+      map.get("lol")
     });
 
     socket.on('receive-message', handleMessage);
@@ -104,6 +104,8 @@ const Page = () => {
 
   const handleContactClick = (id: string) => router.push(`chats/${id}`);
 
+ 
+  
 
   useEffect(() => {
     if (isModalOpen) {
@@ -113,6 +115,8 @@ const Page = () => {
       return () => clearTimeout(timeout)
     }
   }, [isModalOpen])
+
+
 
   return (
     <>
@@ -141,7 +145,7 @@ const Page = () => {
           onClick={() => router.push(`./chats/${chat.userId}`)}
         >
           <div className="flex justify-center items-center">
-            <Avatar avatarUrl={chat.avatar} isOnline={onlineMap.get(chat.userId)} />
+            <Avatar avatarUrl={chat.avatar} isOnline={onlineMap.get(chat.userId)?.online} />
           </div>
           <div className="flex flex-col justify-center px-2 ml-4 text-left">
             <h1 className="font-bold w-full">

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react'
 import {
   HouseIcon,
@@ -25,8 +25,13 @@ const SideBar = () => {
     Icon: React.ComponentType<{ className?: string }>;
   }
 
+  const router = useRouter();
+
   const handleLogOut = async () => {
-    const res = axios.get("/api/auth/logOut",{withCredentials: true})
+    const res = await axios.get("/api/auth/logOut",{withCredentials: true});
+    if(res.status === 200){
+      router.push("/login")
+    }
   }
 
 
@@ -75,7 +80,7 @@ const SideBar = () => {
           <h1 className="font-bold text-base">{user?.name}</h1>
           <p className="text-sm text-gray-600">{user?.email}</p>
         </div>
-        <div onClick={handleLogOut}>
+        <div onClick={handleLogOut} className='cursor-pointer'>
         <LogOutIcon/>
       </div>
       </div>
