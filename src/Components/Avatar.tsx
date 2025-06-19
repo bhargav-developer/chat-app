@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 interface prop {
     avatarUrl: string | undefined,
     altTitle?: string,
     isOnline?: boolean
 }
+
+
 
 const Avatar: React.FC<prop> = ({ avatarUrl,
     altTitle,

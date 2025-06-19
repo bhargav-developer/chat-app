@@ -7,10 +7,12 @@ import {
   MessageSquareText,
   UsersIcon,
   Settings,
+  LogOutIcon,
 } from "lucide-react";
 import { useUserStore } from '@/lib/userStore';
 import { useSocket } from '@/app/hooks/socketContext';
 import Avatar from './Avatar';
+import axios from 'axios';
 
 const SideBar = () => {
 
@@ -21,6 +23,10 @@ const SideBar = () => {
     href: string;
     name: string;
     Icon: React.ComponentType<{ className?: string }>;
+  }
+
+  const handleLogOut = async () => {
+    const res = axios.get("/api/auth/logOut",{withCredentials: true})
   }
 
 
@@ -69,7 +75,11 @@ const SideBar = () => {
           <h1 className="font-bold text-base">{user?.name}</h1>
           <p className="text-sm text-gray-600">{user?.email}</p>
         </div>
+        <div onClick={handleLogOut}>
+        <LogOutIcon/>
       </div>
+      </div>
+      
     </div>
   )
 }

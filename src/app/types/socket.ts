@@ -10,6 +10,7 @@ export interface ServerToClientEvents {
     size: number;
   }>) => void;
    "recieve-file-chunk": (data: {}) => void;
+   "update_users": (data: Object) => void;
 }
 
 export interface ClientToServerEvents {

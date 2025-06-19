@@ -24,20 +24,23 @@ const Page = () => {
   const socket = useSocketStore((state) => state.socket);
 
   interface userI {
-    _id: Number,
+    _id: string,
     firstName: string,
     email: String,
     avatar: string,
+    online?: boolean,
+    lastSeen?: Date,
   }
 
   const { user } = useUserStore();
+  const usersId = []
 
   const [contacts, setContacts] = useState<userI[]>([])
 
   const [query, setQuery] = useState<string>("")
 
 
- 
+
 
   useEffect(() => {
     if (query.length > 1) {
@@ -55,31 +58,40 @@ const Page = () => {
     }
   }, [query])
 
-  useEffect(()=>{
-    if(user){
+  useEffect(() => {
+    if (user) {
       findRecentChats();
     }
-  },[socket])
+  }, [socket])
 
 
   const router = useRouter();
+  const [onlineMap, setOnlineMap] = useState<Map<string, boolean>>(new Map());
 
-   useEffect(() => {
-  if (!socket) return;
 
-  const handleMessage = (data: { senderId: string; content: string; timestamp: string }) => {
-    console.log("Received message:", data);
-    findRecentChats();
-  };
+  useEffect(() => {
+    if (!socket) return;
 
-  socket.on('receive-message', handleMessage);
+    const handleMessage = (data: { senderId: string; content: string; timestamp: string }) => {
+      console.log("Received message:", data);
+      findRecentChats();
+    };
 
-  return () => {
-    socket.off('receive-message', handleMessage);
-  };
-}, [socket]);
 
- const findRecentChats = async () => {
+    socket.on("update_users", (data) => {
+      const map = new Map(Object.entries(data));
+      setOnlineMap(map);
+
+    });
+
+    socket.on('receive-message', handleMessage);
+
+    return () => {
+      socket.off('receive-message', handleMessage);
+    };
+  }, [socket]);
+
+  const findRecentChats = async () => {
     const res = await axios.get("http://localhost:4000/messages/chats", {
       params: {
         userId: user?.id
@@ -90,7 +102,7 @@ const Page = () => {
     setChats(data)
   }
 
-
+  const handleContactClick = (id: string) => router.push(`chats/${id}`);
 
 
   useEffect(() => {
@@ -122,29 +134,29 @@ const Page = () => {
       </div>
 
 
-{chats && chats.map((chat, index) => (
-  <div
-    key={chat.userId || index}  // Prefer a unique ID over index if available
-    className="flex p-5 border-b hover:bg-indigo-100 bg-theme cursor-pointer border-gray-100"
-    onClick={() => router.push(`./chats/${chat.userId}`)}
-  >
-    <div className="flex justify-center items-center">
-      <Avatar avatarUrl={chat.avatar} />
-    </div>
-    <div className="flex flex-col justify-center px-2 ml-4 text-left">
-      <h1 className="font-bold w-full">
-        {chat.firstName} {chat.userId === user?.id && "(you)"}
-      </h1>
-      <p className="text-gray-500 text-sm w-full truncate">
-        {chat.lastMessage}
-      </p>
-    </div>
-  </div>
-))}
+      {chats && chats.map((chat, index) => (
+        <div
+          key={chat.userId || index}  // Prefer a unique ID over index if available
+          className="flex p-5 border-b hover:bg-indigo-100 bg-theme cursor-pointer border-gray-100"
+          onClick={() => router.push(`./chats/${chat.userId}`)}
+        >
+          <div className="flex justify-center items-center">
+            <Avatar avatarUrl={chat.avatar} isOnline={onlineMap.get(chat.userId)} />
+          </div>
+          <div className="flex flex-col justify-center px-2 ml-4 text-left">
+            <h1 className="font-bold w-full">
+              {chat.firstName} {chat.userId === user?.id && "(you)"}
+            </h1>
+            <p className="text-gray-500 text-sm w-full truncate">
+              {chat.lastMessage}
+            </p>
+          </div>
+        </div>
+      ))}
 
 
 
-    
+
 
 
 
@@ -184,9 +196,9 @@ const Page = () => {
               {
                 contacts &&
                 contacts.map((e, index) => {
-                  return <div key={index} onClick={() => {
-                    router.push(`chats/${e._id}`)
-                  }} className='flex gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-2xl mx-6 my-2'>
+                  return <div key={index}
+                    onClick={() => handleContactClick(e._id)}
+                    className='flex gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-2xl mx-6 my-2'>
                     <img src={e.avatar} alt=":(" className='w-11 h-11' />
                     <div className=''>
                       <h1 className='font-bold'>{e.firstName}</h1>
