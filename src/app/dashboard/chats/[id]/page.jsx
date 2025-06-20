@@ -5,11 +5,13 @@ import FileRecieve from '@/Components/FileRecieve'
 import FileUpload from '@/Components/FileUpload'
 import ReqPopUp from '@/Components/ReqPopUp'
 import { useSocketStore } from '@/lib/socketStore'
+import { useUsersStore } from '@/lib/usersStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
 import { ArrowLeftCircleIcon, DeleteIcon, Link2Icon, SendHorizontalIcon, SmileIcon, Trash2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
+import { useState } from 'react'
 
 function page({ params }) {
   const { id } = React.use(params)
@@ -26,6 +28,8 @@ function page({ params }) {
   const [recieveReq, setRecieveReq] = React.useState(false);
   const [recieverName, setRecieveName] = React.useState(null);
   const [isOpen, setIsOpen] = React.useState(false);
+   const { statusMap, setStatus } = useUsersStore();
+ 
 
   const handleDeleteClick = () => setIsOpen(true);
   const handleConfirmDelete = async () => {
@@ -67,10 +71,16 @@ function page({ params }) {
       }
     };
 
+    socket.on("update_users", (data) => {
+       Object.entries(data).forEach(([userId, statusData]) => {
+        setStatus(userId, statusData);
+      });
+    });
+
+
 
     socket.on("file-transfer", () => {
       setUplaod(true)
-      console.log("yes")
     })
 
     socket.on("receive-message", handleMessage);
@@ -110,23 +120,23 @@ function page({ params }) {
     }
   }
 
- 
- 
+
+
   function formatAMPM(data) {
-  const date = new Date(data)
-  let hours = date.getHours();
-  let minutes = date.getMinutes();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
+    const date = new Date(data)
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
 
-  // Convert from 24-hour to 12-hour
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
+    // Convert from 24-hour to 12-hour
+    hours = hours % 12;
+    hours = hours ? hours : 12;
 
-  // Pad minutes
-  minutes = String(minutes).padStart(2, '0');
+    // Pad minutes
+    minutes = String(minutes).padStart(2, '0');
 
-  return `${hours}:${minutes} ${ampm}`;
-}
+    return `${hours}:${minutes} ${ampm}`;
+  }
 
 
   const getMessages = async () => {
@@ -138,7 +148,7 @@ function page({ params }) {
         },
       });
       setMessages(res.data.messages);
-    
+
     } catch (error) {
       console.log(error);
     }
@@ -188,7 +198,7 @@ function page({ params }) {
             <ArrowLeftCircleIcon className="text-indigo-500" />
           </div>
           <div className="relative">
-            <Avatar avatarUrl={User.avatar} />
+            <Avatar avatarUrl={User.avatar} isOnline={statusMap.get(User._id)?.online} />
 
           </div>
           <div>
@@ -204,7 +214,7 @@ function page({ params }) {
       {/* Messages */}
       <div className="bg-gray-50 overflow-auto pt-2 flex-1 gap-3 text-white px-4 flex-col flex">
         {messages.map((msg, index) => (
-          <div      key={index}>
+          <div key={index}>
             <div
               className={`flex ${msg.from === user.id ? "justify-end" : "justify-start"}`}
             >
@@ -220,9 +230,9 @@ function page({ params }) {
                 {msg.content || msg}
               </div>
             </div>
-              <p className={`text-gray-500 ${msg.from === user.id ? 'text-right' : 'text-left ml-10'} text-sm`}>
-                {formatAMPM(msg.timeStamp)}
-                </p>
+            <p className={`text-gray-500 ${msg.from === user.id ? 'text-right' : 'text-left ml-10'} text-sm`}>
+              {formatAMPM(msg.timeStamp)}
+            </p>
           </div>
         ))}
         <div ref={messagesEndRef} />

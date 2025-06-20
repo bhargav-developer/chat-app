@@ -2,6 +2,7 @@
 
 import Avatar from '@/Components/Avatar'
 import { useSocketStore } from '@/lib/socketStore'
+import { useUsersStore } from '@/lib/usersStore'
 import { useUserStore } from '@/lib/userStore'
 import axios from 'axios'
 import { CircleXIcon, PlusIcon } from 'lucide-react'
@@ -66,27 +67,39 @@ const Page = () => {
 
 
   const router = useRouter();
-  const [onlineMap, setOnlineMap] = useState<Map<any,any>>(new Map());
+  const { statusMap, setStatus } = useUsersStore();
+
+
+  useEffect(() => {
+  let timeout: NodeJS.Timeout;
+  if (isModalOpen) {
+    setShowModal(true);
+  } else {
+    timeout = setTimeout(() => setShowModal(false), 300);
+  }
+  return () => clearTimeout(timeout);
+}, [isModalOpen]);
 
 
   useEffect(() => {
     if (!socket) return;
 
-    const handleMessage = (data: { senderId: string; content: string; timestamp: string }) => {
+    const handleMessage = async (data: { senderId: string; content: string; timestamp: string }) => {
       console.log("Received message:", data);
-      findRecentChats();
+      await findRecentChats();
     };
 
 
     socket.on("update_users", (data) => {
-      const map = new Map(Object.entries(data));
-      setOnlineMap(map);
-      map.get("lol")
+      Object.entries(data).forEach(([userId, statusData]) => {
+        setStatus(userId, statusData);
+      });
     });
 
     socket.on('receive-message', handleMessage);
 
     return () => {
+       socket.off('update_users');
       socket.off('receive-message', handleMessage);
     };
   }, [socket]);
@@ -97,15 +110,17 @@ const Page = () => {
         userId: user?.id
       }
     })
-    console.log("sent req")
-    const data = res.data;
-    setChats(data)
+    const data = await res.data;
+    if(data){
+      setChats(data)
+      console.log("got the message dude")
+    }
   }
 
   const handleContactClick = (id: string) => router.push(`chats/${id}`);
 
- 
-  
+
+
 
   useEffect(() => {
     if (isModalOpen) {
@@ -145,7 +160,7 @@ const Page = () => {
           onClick={() => router.push(`./chats/${chat.userId}`)}
         >
           <div className="flex justify-center items-center">
-            <Avatar avatarUrl={chat.avatar} isOnline={onlineMap.get(chat.userId)?.online} />
+            <Avatar avatarUrl={chat.avatar} isOnline={statusMap.get(chat.userId)?.online} />
           </div>
           <div className="flex flex-col justify-center px-2 ml-4 text-left">
             <h1 className="font-bold w-full">
