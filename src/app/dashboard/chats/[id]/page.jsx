@@ -154,18 +154,7 @@ function page({ params }) {
     }
   };
 
-  const handleReqAccept = async () => {
-    try {
-      setRecieve(true)
-      setRecieveReq(false)
-      socket.emit("accept-file-transfer", {
-        from: User._id
-      })
 
-    } catch (error) {
-      console.log(err)
-    }
-  }
 
 
 
@@ -273,16 +262,7 @@ function page({ params }) {
           />
         )}
       </div>
-      {recieveReq &&
-        <div className='absolute h-full w-full'>
-          <ReqPopUp
-            sender={recieverName}
-            timeout={10}
-            onAccept={handleReqAccept}
-            onReject={() => setRecieveReq(false)}
-          />
-        </div>
-      }
+     
 
 
       {isOpen && (

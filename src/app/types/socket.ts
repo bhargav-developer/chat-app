@@ -11,6 +11,7 @@ export interface ServerToClientEvents {
   }>) => void;
    "recieve-file-chunk": (data: {}) => void;
    "update_users": (data: Object) => void;
+    "file-transfer-request": (data: any) => void ;
 }
 
 export interface ClientToServerEvents {
@@ -22,6 +23,7 @@ export interface ClientToServerEvents {
   "file-meta": (data: {name: string,size: number,reciverId: string}) => void;
   "file-chunk": (data: {}) => void;
   "file-end": (data: { name: string }) => void;
+  "accept-file-transfer": (data: any) => void;
 
   'join': (userId: string) => void;
 }
