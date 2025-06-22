@@ -1,6 +1,7 @@
 'use client';
 import { useSocket } from '@/app/hooks/socketContext';
 import { useSocketStore } from '@/lib/socketStore';
+import axios from 'axios';
 import {
   FileIcon,
   TrashIcon,
@@ -14,72 +15,99 @@ interface FileUploadProps {
   reciverId: string;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onClose,reciverId }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
   const [files, setFiles] = useState<File[]>([]);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
-    const [progress, setProgress] = useState<Number>(0);
-    const socket = useSocketStore((state) => state.socket);
+  const [progress, setProgress] = useState<Number>(0);
+  const socket = useSocketStore((state) => state.socket);
 
-    useEffect(() => {
-      if(!socket) return
-    
-      return () => {
-        socket.off()
-      }
-    }, [socket])
-    
+  useEffect(() => {
+    if (!socket) return
+    socket.on("recieve-file-chunk",(data: any)=>{
+      console.log("file chunk",data)
+    })
+    return () => {
+      socket.off()
+    }
+  }, [socket])
+
 
   const handleBrowseClick = () => {
     inputFileRef.current?.click();
   };
-const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (!socket) return; 
-  const fileList = e.target.files;
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!socket) return;
+    const fileList = e.target.files;
+    if (!fileList) return; 
+      const fileArray = Array.from(fileList);
+      setFiles(fileArray)
   if (fileList && fileList.length > 0) {
-    const fileArray = Array.from(fileList);
-    setFiles(fileArray);
-    const file = fileArray[0]
-     const reader = file.stream().getReader();
+    const file = fileList[0];
+    
+    const CHUNK_SIZE = 64 * 1024; // 64KB per chunk
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
-
-    socket.emit("file-meta",{
+    socket.emit("file-meta", {
       name: file.name,
       size: file.size,
+      // type: file.type,
+      // totalChunks,
       reciverId
-    })
+    });
 
-    
+    const stream = file.stream();
+    const reader = stream.getReader();
+    let chunkIndex = 0;
+    let uploadedSize = 0;
 
-      let sent = 0;
+    const readChunk = async () => {
+      const { done, value } = await reader.read();
+      if (done) {
+        console.log("File upload completed");
+        socket.emit("file-end",{
+          name: file.name,
+          fileType: file.type,
+          reciverId
+        })
+        return;
+      }
 
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
+        console.log(progress);
 
-                sent += value.length;
-                setProgress(Math.round((sent / file.size) * 100));
-                socket.emit("file-chunk",{
-                  fileData: value,
-                  reciverId
-                })
-                
-            }
+
+      // Send chunk to server
+      socket.emit("file-chunk", {
+        chunkIndex,
+        fileName: file.name,
+        reciverId,
+        buffer: value
+      });
+
+      uploadedSize += value.length;
+      setProgress(Math.floor((uploadedSize / file.size) * 100));
+      chunkIndex++;
+
+      // Read next chunk
+      readChunk();
+    };
+
+    readChunk();
   }
 };
 
 
- const formatFileSize = (size: number) => {
-  const mb = size / 1_000_000;
 
-  
-  return `${mb.toFixed(2)} MB`;
-};
+  const formatFileSize = (size: number) => {
+    const mb = size / 1_000_000;
+
+    return `${mb.toFixed(2)} MB`;
+  };
 
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white relative w-full max-w-4xl rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col md:flex-row gap-8">
 
-        
+
         {/* Close button */}
         <button
           onClick={onClose}
@@ -122,6 +150,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
           </div>
 
           <div className="space-y-4">
+    
             {files.map((file, index) => (
               <div
                 key={index}

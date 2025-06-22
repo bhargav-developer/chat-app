@@ -7,8 +7,8 @@ interface FileUploadProps {
 }
 
 interface FuckIt {
-    file: string;
-    size: number;
+  file: string;
+  size: number;
 }
 
 
@@ -16,6 +16,7 @@ interface FuckIt {
 const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   const [files, setFiles] = useState<FuckIt[]>([]);
   const socket = useSocketStore((state) => state.socket);
+  const receivedChunks: Buffer[] = [];
 
   useEffect(() => {
 
@@ -23,12 +24,27 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
 
     socket.on("meta-transfer", (data) => {
       setFiles(data)
-      console.log(data)
     })
 
-    socket.on("recieve-file-chunk",(data)=>{
-        console.log("file chunk",data)
+    socket.on("recieve-file-chunk", (data: any) => {
+      receivedChunks.push(data.chunk)
     })
+
+    socket.on("file-transfer-end", (data) => {
+      if (receivedChunks.length < 0) return
+      const blob = new Blob(receivedChunks, { type: data.fileType || 'application/octet-stream' });
+
+      // Create a download link
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      a.href = url;
+      a.download = data.name || 'downloaded_file';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    })
+
 
     return () => {
       socket.off("meta-transfer")
@@ -36,12 +52,12 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   }, [socket])
 
 
-   const formatFileSize = (size: number) => {
-  const mb = size / 1_000_000;
+  const formatFileSize = (size: number) => {
+    const mb = size / 1_000_000;
 
-  
-  return `${mb.toFixed(2)} MB`;
-};
+
+    return `${mb.toFixed(2)} MB`;
+  };
 
 
 
@@ -85,7 +101,7 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
                   </div>
                 </div>
                 <TrashIcon
-                
+
                   className="w-5 h-5 text-red-500 hover:text-red-600 cursor-pointer transition"
                 />
               </div>

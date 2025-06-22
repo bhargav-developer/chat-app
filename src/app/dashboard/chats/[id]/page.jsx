@@ -11,7 +11,6 @@ import axios from 'axios'
 import { ArrowLeftCircleIcon, DeleteIcon, Link2Icon, SendHorizontalIcon, SmileIcon, Trash2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
-import { useState } from 'react'
 
 function page({ params }) {
   const { id } = React.use(params)
@@ -64,12 +63,7 @@ function page({ params }) {
       setMessages((prev) => [...prev, msg]);
     };
 
-    const handleFileTransferReq = (msg) => {
-      if (msg.sender) {
-        setRecieveName(msg.sender)
-        setRecieveReq(true)
-      }
-    };
+ 
 
     socket.on("update_users", (data) => {
        Object.entries(data).forEach(([userId, statusData]) => {
@@ -84,10 +78,8 @@ function page({ params }) {
     })
 
     socket.on("receive-message", handleMessage);
-    socket.on("file-transfer-request", handleFileTransferReq);
     return () => {
       socket.off("receive-message", handleMessage);
-      socket.off("file-transfer-request", handleFileTransferReq);
     };
   }, [socket]);
 
@@ -292,10 +284,7 @@ function page({ params }) {
         upload && <FileUpload reciverId={User._id} onClose={() => setUplaod(false)} />
 
       }
-      {
-        recieve && <FileRecieve onClose={() => setRecieve(false)} />
-
-      }
+  
 
 
     </div>

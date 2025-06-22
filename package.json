@@ -15,6 +15,7 @@
     "concurrently": "^9.1.2",
     "cookie-parser": "^1.4.7",
     "emoji-picker-react": "^4.12.2",
+    "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.487.0",
