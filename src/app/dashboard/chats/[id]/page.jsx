@@ -27,8 +27,8 @@ function page({ params }) {
   const [recieveReq, setRecieveReq] = React.useState(false);
   const [recieverName, setRecieveName] = React.useState(null);
   const [isOpen, setIsOpen] = React.useState(false);
-   const { statusMap, setStatus } = useUsersStore();
- 
+  const { statusMap, setStatus } = useUsersStore();
+
 
   const handleDeleteClick = () => setIsOpen(true);
   const handleConfirmDelete = async () => {
@@ -40,6 +40,30 @@ function page({ params }) {
       setMessages([])
     }
 
+  };
+
+  const formatDateGroup = (timestamp) => {
+    const now = new Date();
+    const input = new Date(timestamp);
+
+    // Set all to midnight for comparison
+    const today = new Date(now.setHours(0, 0, 0, 0));
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const inputDay = new Date(input.setHours(0, 0, 0, 0));
+
+    if (inputDay.getTime() === today.getTime()) {
+      return "Today";
+    } else if (inputDay.getTime() === yesterday.getTime()) {
+      return "Yesterday";
+    } else {
+      return input.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+    }
   };
 
 
@@ -63,10 +87,10 @@ function page({ params }) {
       setMessages((prev) => [...prev, msg]);
     };
 
- 
+
 
     socket.on("update_users", (data) => {
-       Object.entries(data).forEach(([userId, statusData]) => {
+      Object.entries(data).forEach(([userId, statusData]) => {
         setStatus(userId, statusData);
       });
     });
@@ -180,7 +204,6 @@ function page({ params }) {
           </div>
           <div className="relative">
             <Avatar avatarUrl={User.avatar} isOnline={statusMap.get(User._id)?.online} />
-
           </div>
           <div>
             <h1>{`${User.firstName} ${User.lastName}`}</h1>
@@ -199,6 +222,7 @@ function page({ params }) {
             <div
               className={`flex ${msg.from === user.id ? "justify-end" : "justify-start"}`}
             >
+              
               {msg.from !== user.id && (
                 <img className="h-8 w-8" src={User.avatar} alt="" />
               )}
@@ -206,8 +230,8 @@ function page({ params }) {
                 className={`p-3 ${msg.from === user.id
                   ? "bg-blue-600 rounded-2xl rounded-tr-md"
                   : "border border-gray-200 rounded-2xl rounded-tl-md text-black"
-                  } max-w-xs`}
-              >
+                } max-w-xs`}
+                >
                 {msg.content || msg}
               </div>
             </div>
@@ -254,7 +278,7 @@ function page({ params }) {
           />
         )}
       </div>
-     
+
 
 
       {isOpen && (
@@ -284,7 +308,7 @@ function page({ params }) {
         upload && <FileUpload reciverId={User._id} onClose={() => setUplaod(false)} />
 
       }
-  
+
 
 
     </div>

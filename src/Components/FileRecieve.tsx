@@ -39,15 +39,16 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
       const url = URL.createObjectURL(blob);
       a.href = url;
       a.download = data.name || 'downloaded_file';
-      document.body.appendChild(a);
-      a.click();
+    document.body.appendChild(a);
+      a.click()
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);;
     })
 
 
     return () => {
       socket.off("meta-transfer")
+      socket.off("file-transfer-end")
     }
   }, [socket])
 
