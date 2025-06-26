@@ -23,9 +23,6 @@ function page({ params }) {
   const messagesEndRef = React.useRef(null);
   const [showPicker, setShowPicker] = React.useState(false);;
   const [upload, setUplaod] = React.useState(false);
-  const [recieve, setRecieve] = React.useState(false);
-  const [recieveReq, setRecieveReq] = React.useState(false);
-  const [recieverName, setRecieveName] = React.useState(null);
   const [isOpen, setIsOpen] = React.useState(false);
   const { statusMap, setStatus } = useUsersStore();
 

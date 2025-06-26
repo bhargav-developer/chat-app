@@ -37,6 +37,7 @@ const Page = () => {
   const usersId = []
 
   const [contacts, setContacts] = useState<userI[]>([])
+  const [searching, setSearching] = useState<boolean>(false)
 
   const [query, setQuery] = useState<string>("")
 
@@ -45,9 +46,12 @@ const Page = () => {
 
   useEffect(() => {
     if (query.length > 1) {
+      setSearching(true)
+      setContacts([])
       const delayDebounce = setTimeout(async () => {
         const res = await axios.post("/api/profile/search-profile", { query });
         if (res.status === 200) {
+          setSearching(false)
           const data = res.data.Users
           setContacts(data)
         }
@@ -56,6 +60,7 @@ const Page = () => {
       return () => clearTimeout(delayDebounce);
     } else {
       setContacts([])
+      setSearching(false)
     }
   }, [query])
 
@@ -211,6 +216,9 @@ const Page = () => {
                 placeholder='Enter name or email'
               />
             </div>
+              {searching && 
+              <div className='text-2xl text-center'> loading... </div>
+              }
             <div className='mb-6'>
               {
                 contacts &&

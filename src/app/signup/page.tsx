@@ -2,9 +2,7 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import toast from 'react-hot-toast';
-
-
+import toast, { Toaster } from 'react-hot-toast';
 const Page = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -46,12 +44,12 @@ const Page = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      toast.success("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
 
     if (passwordError) {
-      toast.success("Please fix the password issue first.");
+      toast.error("Please fix the password first.");
       return;
     }
 
@@ -64,12 +62,10 @@ const Page = () => {
       if (res.status === 201) {
         toast.success('Registration successful!');
         router.push('./profile');
-      } else {
-        toast.success('Registration failed!');
       }
     } catch (err: any) {
       const errMessage = await err.response.data.message
-      toast.success(errMessage || "Something went Wrong");
+      toast.error(errMessage || "Something went Wrong");
     }finally{
       setLoading(false)
     }
@@ -77,6 +73,7 @@ const Page = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
+            <Toaster position="bottom-right" />
       <div className="flex max-w-5xl w-full backdrop-blur-md bg-white/30 border border-white/20 rounded-2xl overflow-hidden shadow-xl">
         {/* Left Image Section */}
         <div className="w-1/2 hidden md:block relative">

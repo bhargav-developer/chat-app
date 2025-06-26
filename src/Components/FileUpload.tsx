@@ -23,8 +23,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
 
   useEffect(() => {
     if (!socket) return
-    socket.on("recieve-file-chunk",(data: any)=>{
-      console.log("file chunk",data)
+    socket.on("recieve-file-chunk", (data: any) => {
+      console.log("file chunk", data)
     })
     return () => {
       socket.off()
@@ -38,62 +38,63 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!socket) return;
     const fileList = e.target.files;
-    if (!fileList) return; 
-      const fileArray = Array.from(fileList);
-      setFiles(fileArray)
-  if (fileList && fileList.length > 0) {
-    const file = fileList[0];
-    
-    const CHUNK_SIZE = 64 * 1024; // 64KB per chunk
-    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    console.log(fileList)
+    if (!fileList) return;
+    const fileArray = Array.from(fileList);
+    setFiles(fileArray)
+    if (fileList && fileList.length > 0) {
+      const file = fileList[0];
 
-    socket.emit("file-meta", {
-      name: file.name,
-      size: file.size,
-      // type: file.type,
-      // totalChunks,
-      reciverId
-    });
+      const CHUNK_SIZE = 64 * 1024; // 64KB per chunk
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
-    const stream = file.stream();
-    const reader = stream.getReader();
-    let chunkIndex = 0;
-    let uploadedSize = 0;
+      socket.emit("file-meta", {
+        name: file.name,
+        size: file.size,
+        // type: file.type,
+        // totalChunks,
+        reciverId
+      });
 
-    const readChunk = async () => {
-      const { done, value } = await reader.read();
-      if (done) {
-        console.log("File upload completed");
-        socket.emit("file-end",{
-          name: file.name,
-          fileType: file.type,
-          reciverId
-        })
-        return;
-      }
+      const stream = file.stream();
+      const reader = stream.getReader();
+      let chunkIndex = 0;
+      let uploadedSize = 0;
+
+      const readChunk = async () => {
+        const { done, value } = await reader.read();
+        if (done) {
+          console.log("File upload completed");
+          socket.emit("file-end", {
+            name: file.name,
+            fileType: file.type,
+            reciverId
+          })
+          return;
+        }
 
         console.log(progress);
 
 
-      // Send chunk to server
-      socket.emit("file-chunk", {
-        chunkIndex,
-        fileName: file.name,
-        reciverId,
-        buffer: value
-      });
+        // Send chunk to server
+        socket.emit("file-chunk", {
+          chunkIndex,
+          fileName: file.name,
+          reciverId,
+          buffer: value
+        });
 
-      uploadedSize += value.length;
-      setProgress(Math.floor((uploadedSize / file.size) * 100));
-      chunkIndex++;
+        uploadedSize += value.length;
+        setProgress(Math.floor((uploadedSize / file.size) * 100));
+        chunkIndex++;
 
-      // Read next chunk
+        // Read next chunk
+        readChunk();
+      };
+
       readChunk();
-    };
-
-    readChunk();
-  }
-};
+    }
+  };
 
 
 
@@ -150,7 +151,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
           </div>
 
           <div className="space-y-4">
-    
+
             {files.map((file, index) => (
               <div
                 key={index}

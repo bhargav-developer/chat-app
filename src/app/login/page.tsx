@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { EyeIcon, EyeClosedIcon } from "lucide-react";
+import { login } from "../apiEndPoints/auth";
 
 const Page = () => {
   const router = useRouter();
@@ -27,14 +28,12 @@ const Page = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("/api/auth/login", loginData, {
-        withCredentials: true,
-      });
-
-      if (res.status === 200) {
+      const result = await login(loginData)
+      if ("isAxiosError" in result) {
+        console.error("Login failed", result.message);
+      }
         toast.success("Successfully logged in.");
         router.push("/dashboard");
-      }
     } catch (err: any) {
       const message = err?.response?.data?.message || "Login failed. Please try again.";
       toast.error(message);
@@ -99,7 +98,7 @@ const Page = () => {
                   required
                   value={loginData.password}
                   onChange={handleChange}
-                  placeholder={showPassword ? "password" :"••••••••"}
+                  placeholder={showPassword ? "password" : "••••••••"}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <div
