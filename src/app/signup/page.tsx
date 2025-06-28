@@ -3,6 +3,7 @@ import React, { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast, { Toaster } from 'react-hot-toast';
+import { signUp } from "../apiEndPoints/auth";
 const Page = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -55,11 +56,8 @@ const Page = () => {
 
     try {
       setLoading(true)
-      const res = await axios.post("/api/auth/signup",formData,{
-        withCredentials: true
-      })
-
-      if (res.status === 201) {
+      const res = await signUp(formData)
+      if (res) {
         toast.success('Registration successful!');
         router.push('./profile');
       }

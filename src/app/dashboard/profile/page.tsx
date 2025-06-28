@@ -111,7 +111,6 @@ const UserProfile: React.FC = () => {
           </div>
           <h2 className="text-xl font-bold mt-4">{formData.firstName} {formData.lastName}</h2>
           <p className="text-gray-600">{formData.email}</p>
-          <span className="text-green-500 text-sm mt-1">● Online</span>
         </div>
 
         {/* Personal Info */}

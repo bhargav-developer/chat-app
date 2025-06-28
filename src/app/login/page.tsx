@@ -32,8 +32,8 @@ const Page = () => {
       if ("isAxiosError" in result) {
         console.error("Login failed", result.message);
       }
-        toast.success("Successfully logged in.");
-        router.push("/dashboard");
+      toast.success("Successfully logged in.");
+      router.push("/dashboard");
     } catch (err: any) {
       const message = err?.response?.data?.message || "Login failed. Please try again.";
       toast.error(message);

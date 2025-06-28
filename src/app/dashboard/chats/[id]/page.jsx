@@ -204,7 +204,7 @@ function page({ params }) {
           </div>
           <div>
             <h1>{`${User.firstName} ${User.lastName}`}</h1>
-            <p className="text-gray-600">online</p>
+          <span className="text-green-500 text-sm mt-1">● Online</span>
           </div>
         </div>
         <div className="flex gap-2 justify-between items-centers">

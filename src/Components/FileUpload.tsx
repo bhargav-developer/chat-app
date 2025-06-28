@@ -35,6 +35,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
   const handleBrowseClick = () => {
     inputFileRef.current?.click();
   };
+
+  
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!socket) return;
     const fileList = e.target.files;
