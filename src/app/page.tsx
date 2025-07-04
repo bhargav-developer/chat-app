@@ -1,7 +1,10 @@
+"use client"
 import React from 'react';
 import { MessageSquare, Upload, Lock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const App = () => {
+  const router = useRouter()
   const features = [
     { icon: <MessageSquare className="w-8 h-8 text-indigo-600" />, title: 'Real-Time Chat', desc: 'Instant messaging with zero delay, perfect for team or individual use.' },
     { icon: <Upload className="w-8 h-8 text-indigo-600" />, title: 'Fast File Transfers', desc: 'Send large files instantly — supports up to 5GB uploads.' },
@@ -33,7 +36,7 @@ const App = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">Real-Time Chat & Secure File Sharing</h2>
           <p className="text-lg sm:text-xl mb-8">Lightning-fast messaging and encrypted file transfers — all in one sleek platform.</p>
-          <a href="#cta" className="inline-block bg-white text-indigo-600 px-6 py-3 rounded-md font-semibold hover:bg-gray-100 transition">
+          <a onClick={() => router.push("/login")} className="inline-block bg-white text-indigo-600 px-6 py-3 rounded-md font-semibold cursor-pointer hover:bg-gray-100 transition">
             Try ChatWave Free
           </a>
         </div>
@@ -75,7 +78,7 @@ const App = () => {
         <div className="max-w-xl mx-auto">
           <h3 className="text-3xl sm:text-4xl font-bold mb-4">Ready to Start?</h3>
           <p className="text-lg mb-6">Create your free account and start chatting securely now.</p>
-          <a href="#" className="bg-white text-indigo-600 px-6 py-3 rounded-md font-semibold hover:bg-gray-100 transition">
+          <a onClick={() => router.push("/login")} className="bg-white text-indigo-600 px-6 py-3 rounded-md font-semibold hover:bg-gray-100 cursor-pointer transition">
             Get Started for Free
           </a>
         </div>

@@ -26,7 +26,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [recieveReq, setRecieveReq] = useState(false);
   const [recieverName, setRecieveName] = useState<string>("");
   //  const [isOpen, setIsOpen] = useState(false);
-  //   const { statusMap, setStatus } = useUsersStore();
+    const { statusMap, setStatus } = useUsersStore();
 
   useEffect(() => {
     getUserInfo();
@@ -48,11 +48,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       }
     };
 
-    // socket.on("update_users", (data) => {
-    //    Object.entries(data).forEach(([userId, statusData]) => {
-    //     setStatus(userId, statusData);
-    //   });
-    // });
+    socket.on("update_users", (data) => {
+       Object.entries(data).forEach(([userId, statusData]) => {
+        setStatus(userId, statusData);
+      });
+      console.log("users",statusMap)
+    });
 
 
 

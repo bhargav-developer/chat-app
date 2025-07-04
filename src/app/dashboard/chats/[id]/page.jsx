@@ -76,6 +76,9 @@ function page({ params }) {
     }
   }, [User, user]);
 
+  React.useEffect(() => {
+    console.log(statusMap)
+  }, [statusMap])
   // Socket listener
   React.useEffect(() => {
     if (!socket) return;
@@ -90,6 +93,7 @@ function page({ params }) {
       Object.entries(data).forEach(([userId, statusData]) => {
         setStatus(userId, statusData);
       });
+
     });
 
 
@@ -183,6 +187,12 @@ function page({ params }) {
     }
   };
 
+  const something = (data) => {
+  
+    
+  }
+
+
 
   if (!user?.id || !User?._id) {
     return <div className="p-4">Loading chat...</div>;
@@ -200,11 +210,14 @@ function page({ params }) {
             <ArrowLeftCircleIcon className="text-indigo-500" />
           </div>
           <div className="relative">
-            <Avatar avatarUrl={User.avatar} isOnline={statusMap.get(User._id)?.online} />
+            <Avatar avatarUrl={User.avatar} />
           </div>
           <div>
             <h1>{`${User.firstName} ${User.lastName}`}</h1>
-          <span className="text-green-500 text-sm mt-1">● Online</span>
+            {
+              statusMap.get(User._id)?.online ? <span className="text-green-500 text-sm mt-1">● Online</span> : 
+              <span className="text-gray-500 text-sm mt-1">{something(statusMap.get(User._id)?.lastSeen)}</span> 
+            }
           </div>
         </div>
         <div className="flex gap-2 justify-between items-centers">
@@ -219,7 +232,7 @@ function page({ params }) {
             <div
               className={`flex ${msg.from === user.id ? "justify-end" : "justify-start"}`}
             >
-              
+
               {msg.from !== user.id && (
                 <img className="h-8 w-8" src={User.avatar} alt="" />
               )}
@@ -227,8 +240,8 @@ function page({ params }) {
                 className={`p-3 ${msg.from === user.id
                   ? "bg-blue-600 rounded-2xl rounded-tr-md"
                   : "border border-gray-200 rounded-2xl rounded-tl-md text-black"
-                } max-w-xs`}
-                >
+                  } max-w-xs`}
+              >
                 {msg.content || msg}
               </div>
             </div>
