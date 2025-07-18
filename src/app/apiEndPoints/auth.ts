@@ -1,15 +1,15 @@
 import { loginPayload, signupPayload } from "@/Interfaces/auth"
-import axios, { AxiosError } from "axios"
+import axios, { AxiosResponse } from "axios"
 
 interface Response {
     message: string,
-    status: Number
+    status: number
 }
 
-export const login = async (data: loginPayload): Promise<Response | Error> => {
+export const login = async (data: loginPayload): Promise<AxiosResponse | Error> => {
     try {
         const req = await axios.post(`/api/auth/login`, data, { withCredentials: true })
-        const res = { message: req.data, status: req.status }
+        const res = { name: "Bhargav",message: req.data, status: req.status }
         return res
     } catch (err) {
         return err as Error;

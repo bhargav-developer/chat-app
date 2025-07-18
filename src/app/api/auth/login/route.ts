@@ -2,7 +2,6 @@ import User from "@/Models/user";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from '@/lib/mongodb'; 
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import { loginPayload } from "@/Interfaces/auth";
 import userInterface from "@/Interfaces/user";
 
@@ -59,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     return res;
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err);
     return NextResponse.json({ message: "Something went wrong." }, { status: 500 });
   }
