@@ -12,10 +12,16 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Image from "next/image";
+import SplitText from "@/Components/AnimationText";
+import { useEffect } from "react";
 
 export default function Home() {
   const { user } = useUserStore();
   const router = useRouter();
+
+  useEffect(()=>{
+console.log(user)
+  },[user])
 
   // Demo Data
   const unrepliedMessages = 3;
@@ -50,9 +56,33 @@ export default function Home() {
         {/* Top Navbar */}
         <header className="bg-white shadow px-6 py-4 flex items-center justify-between sticky top-0 z-20">
           <div>
-            <h1 className="text-xl font-semibold text-gray-800">
-              Welcome, {user?.name || "Guest"} 👋
-            </h1>
+  { user?.name &&
+    <SplitText
+  text={`Hello, ${user?.name}`}
+
+
+  className="text-4xl p-2 font-semibold text-center"
+
+  delay={100}
+
+  duration={0.6}
+
+  ease="power3.out"
+
+  splitType="chars"
+
+  from={{ opacity: 0, y: 40 }}
+
+  to={{ opacity: 1, y: 0 }}
+
+  threshold={0.1}
+
+  rootMargin="-100px"
+
+  textAlign="center"
+
+/>
+}
             <p className="text-sm text-gray-500">You have {unrepliedMessages} unreplied messages.</p>
           </div>
 
