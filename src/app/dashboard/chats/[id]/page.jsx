@@ -200,7 +200,6 @@ function page({ params }) {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Chat header */}
       <div className="flex p-4 border-b border-gray-100 justify-between">
         <div className="flex gap-3">
           <div
