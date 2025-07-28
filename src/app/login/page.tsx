@@ -6,7 +6,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 import { login } from "../apiEndPoints/auth";
 import Image from "next/image";
-import {  AxiosResponse } from "axios";
 
 const Page = () => {
   const router = useRouter();
@@ -40,15 +39,9 @@ const Page = () => {
 
     try {
       setLoading(true);
-      const result = await login({ email, password }) as AxiosResponse;
-
-      if (rememberMe) {
-        localStorage.setItem("email", email);
-      } else {
-        localStorage.removeItem("email");
-      }
-
-      if (result.status === 200) {
+      const result = await login({ email, password });
+    if ("status" in result && result.status === 200) {
+        console.log(result)
         toast.success("Successfully logged in.");
         router.push("/dashboard");
       }
