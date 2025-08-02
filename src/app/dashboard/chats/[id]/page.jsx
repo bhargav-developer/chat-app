@@ -188,7 +188,7 @@ function page({ params }) {
   };
 
   const something = (data) => {
-  
+  console.log("lst seen ",data)
     
   }
 
