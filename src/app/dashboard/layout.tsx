@@ -1,17 +1,13 @@
 "use client";
-import { FC, ReactNode, useEffect, useState } from "react";
-import Link from "next/link";
+import {ReactNode, useEffect, useState } from "react";
 import { useUserStore } from "@/lib/userStore";
-
-import { usePathname, useRouter } from "next/navigation";
-import axios from "axios";
-import { useSocket } from "../hooks/socketContext";
-import sideBar from "@/Components/sideBar";
+import axios, { AxiosError } from "axios";
 import SideBar from "@/Components/sideBar";
 import { useSocketStore } from "@/lib/socketStore";
 import { useUsersStore } from "@/lib/usersStore";
 import ReqPopUp from "@/Components/ReqPopUp";
 import FileRecieve from "@/Components/FileRecieve";
+import { useRouter } from "next/navigation";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -22,7 +18,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const socket = useSocketStore((state) => state.socket);
   const [recieve, setRecieve] = useState(false);
-  const [senderId, setSenderId] = useState(null);
+  const [senderId, setSenderId] = useState<string | null>(null);
   const [recieveReq, setRecieveReq] = useState(false);
   const [recieverName, setRecieveName] = useState<string>("");
   //  const [isOpen, setIsOpen] = useState(false);
@@ -40,7 +36,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     //   setMessages((prev: any) => [...prev, msg]);
     // };
 
-    const handleFileTransferReq = (msg: any) => {
+    const handleFileTransferReq = (msg: {sender: string,senderId: string}) => {
       if (msg.sender) {
         setRecieveName(msg.sender)
         setRecieveReq(true)
@@ -94,9 +90,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         name: `${firstName} ${lastName}`,
         avatar,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      if (error.status === 401) {
+      const err = error as AxiosError
+      if (err.status === 401) {
         router.push("/login");
       }
     }
