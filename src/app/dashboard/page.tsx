@@ -11,14 +11,20 @@ import {
 import Image from "next/image";
 import SplitText from "@/Components/AnimationText";
 import { useEffect } from "react";
+import axios from "axios";
 
 export default function Home() {
   const { user } = useUserStore();
   const router = useRouter();
 
-  useEffect(()=>{
-console.log(user)
-  },[user])
+
+  const handleLogout = async () => {
+    const res = await axios.get("/api/auth/logOut");
+    console.log(res)
+    if(res){
+      router.push("/login")
+    }
+  }
 
   // Demo Data
   const unrepliedMessages = 3;
@@ -96,8 +102,8 @@ console.log(user)
 
             {/* Logout */}
             <button
-              onClick={() => router.push("/logout")}
-              className="text-sm flex items-center gap-2 text-red-500 hover:text-red-600 transition"
+              onClick={handleLogout}
+              className="text-sm cursor-pointer flex items-center gap-2 text-red-500 hover:text-red-600 transition"
             >
               <LogOut size={18} />
               Logout

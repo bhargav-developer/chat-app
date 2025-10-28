@@ -8,6 +8,7 @@ import axios from 'axios'
 import { CircleXIcon, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import toast, { Toaster } from 'react-hot-toast'
 
 interface Chat {
   userId: string;
@@ -110,15 +111,20 @@ const Page = () => {
   }, [socket]);
 
   const findRecentChats = async () => {
-    const res = await axios.get("http://localhost:4000/messages/chats", {
-      params: {
-        userId: user?.id
+    try{
+      const res = await axios.get("http://localhost:4000/messages/chats", {
+        params: {
+          userId: user?.id
+        }
+      })
+      const data = await res.data;
+      if(data){
+        setChats(data)
+        console.log("got the message dude")
       }
-    })
-    const data = await res.data;
-    if(data){
-      setChats(data)
-      console.log("got the message dude")
+    }catch(err){
+      console.log("lol ",err)
+      toast.error("an error occured , try after some time")
     }
   }
 
@@ -141,6 +147,7 @@ const Page = () => {
   return (
     <>
       <div className='border-b border-gray-100'>
+      <Toaster position='top-right' ></Toaster>
         <div className='px-2 mb-4 m-2'>
           <div className='flex justify-between'>
             <h1 className='font-bold text-xl p-3'>Chat List</h1>
