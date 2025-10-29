@@ -36,6 +36,7 @@ const Page = () => {
 
   const { user } = useUserStore();
   const usersId = []
+  const socketUrl: string | undefined = process.env.NEXT_PUBLIC_SOCKET; 
 
   const [contacts, setContacts] = useState<userI[]>([])
   const [searching, setSearching] = useState<boolean>(false)
@@ -112,7 +113,8 @@ const Page = () => {
 
   const findRecentChats = async () => {
     try{
-      const res = await axios.get("http://localhost:4000/messages/chats", {
+      console.log("socketUrl: ",socketUrl)
+      const res = await axios.get(`${socketUrl}/messages/chats`, {
         params: {
           userId: user?.id
         }

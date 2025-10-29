@@ -38,8 +38,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     const handleFileTransferReq = (msg: {sender: string,senderId: string}) => {
       if (msg.sender) {
-        setRecieveName(msg.sender)
         setRecieveReq(true)
+        setRecieveName(msg.sender)
         setSenderId(msg.senderId)
       }
     };
@@ -79,6 +79,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   }
 
+
+    const handleReqReject = async () => {
+    try {
+      if (!socket) return;
+      setRecieve(true)
+      setRecieveReq(false)
+     socket.emit("accept-file-transfer", {
+        from: senderId
+      }) 
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const getUserInfo = async () => {
     try {

@@ -25,6 +25,7 @@ function page({ params }) {
   const [upload, setUplaod] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
   const { statusMap, setStatus } = useUsersStore();
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET
 
 
   const handleDeleteClick = () => setIsOpen(true);
@@ -158,12 +159,13 @@ function page({ params }) {
 
   const getMessages = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/messages/getMessage", {
+      const res = await axios.get(`${socketUrl}/messages/getMessage`, {
         params: {
           from: user.id,
           to: User._id,
         },
       });
+      console.log("socketUrl: ",socketUrl)
       setMessages(res.data.messages);
 
     } catch (error) {
@@ -238,7 +240,7 @@ function page({ params }) {
               <div
                 className={`p-3 ${msg.from === user.id
                   ? "bg-blue-600 rounded-2xl rounded-tr-md"
-                  : "border border-gray-200 rounded-2xl rounded-tl-md text-black"
+                  : "border border-gray-500 rounded-2xl rounded-tl-md text-black"
                   } max-w-xs`}
               >
                 {msg.content || msg}
