@@ -172,7 +172,7 @@ const Page = () => {
           key={chat.userId || index}  // Prefer a unique ID over index if available
           className="flex p-5 border-b hover:bg-indigo-100 bg-theme cursor-pointer border-gray-100"
           onClick={() => router.push(`./chats/${chat.userId}`)}
-        >
+        > 
           <div className="flex justify-center items-center">
             <Avatar avatarUrl={chat.avatar} isOnline={statusMap.get(chat.userId)?.online} />
           </div>

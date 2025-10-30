@@ -10,47 +10,60 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import SplitText from "@/Components/AnimationText";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
+
+
+interface Chats {
+  userId: string,
+  avatar: string,
+  firstName: string,
+  lastMessage: string,
+  timeStamp: string
+}
+
 export default function Home() {
+
+
   const { user } = useUserStore();
   const router = useRouter();
+  const [recentChats, setRecentChats] = useState<Chats[]>([]);
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET;
 
+
+  useEffect(() => {
+    findRecentChats()
+  }, [router])
 
   const handleLogout = async () => {
     const res = await axios.get("/api/auth/logOut");
     console.log(res)
-    if(res){
+    if (res) {
       router.push("/login")
+    }
+  }
+
+  const findRecentChats = async () => {
+    try {
+      const res = await axios.get(`${socketUrl}/messages/chats`, {
+        params: {
+          userId: user?.id
+        }
+      })
+      const data = await res.data;
+      console.log(data)
+      if(data){
+        setRecentChats(data);
+      }
+    } catch (error) {
+        console.log(error)
     }
   }
 
   // Demo Data
   const unrepliedMessages = 3;
-  const recentChats = [
-    {
-      id: 1,
-      name: "Alice Johnson",
-      message: "Hey! Can we reschedule the meeting?",
-      time: "2 mins ago",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    },
-    {
-      id: 2,
-      name: "John Smith",
-      message: "Shared the docs on Slack.",
-      time: "10 mins ago",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    },
-    {
-      id: 3,
-      name: "Maria Garcia",
-      message: "Let’s catch up today?",
-      time: "30 mins ago",
-      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
-    },
-  ];
+
 
   return (
     <>
@@ -59,33 +72,31 @@ export default function Home() {
         {/* Top Navbar */}
         <header className="bg-white shadow px-6 py-4 flex items-center justify-between sticky top-0 z-20">
           <div>
-  { user?.name &&
-    <SplitText
-  text={`Hello, ${user?.name}`}
+            {user?.name &&
+              <SplitText
+                text={`Hello, ${user?.name}`}
+                className="text-4xl p-1 font-semibold text-center"
 
+                delay={100}
 
-  className="text-4xl p-1 font-semibold text-center"
+                duration={0.4}
 
-  delay={100}
+                ease="power3.out"
 
-  duration={0.4}
+                splitType="chars"
 
-  ease="power3.out"
+                from={{ opacity: 0, y: 40 }}
 
-  splitType="chars"
+                to={{ opacity: 1, y: 0 }}
 
-  from={{ opacity: 0, y: 40 }}
+                threshold={0.1}
 
-  to={{ opacity: 1, y: 0 }}
+                rootMargin="-100px"
 
-  threshold={0.1}
+                textAlign="center"
 
-  rootMargin="-100px"
-
-  textAlign="center"
-
-/>
-}
+              />
+            }
             <p className="text-sm text-gray-500">You have {unrepliedMessages} unreplied messages.</p>
           </div>
 
@@ -128,23 +139,23 @@ export default function Home() {
             </div>
 
             <div className="space-y-4">
-              {recentChats.map((chat) => (
-                <div key={chat.id} className="flex items-center justify-between hover:bg-gray-50 p-2 rounded-md transition">
+              {recentChats && recentChats.map((chat,index) => (
+                <div onClick={() => router.push(`/dashboard/chats/${chat.userId}`)} key={index} className="flex items-center justify-between hover:bg-gray-50 p-2 rounded-md transition">
                   <div className="flex items-center gap-4">
-                    <Image
+                    <img
                       src={chat.avatar}
-                      alt={chat.name}
+                      alt={chat.firstName}
                       width={40}
                       height={40}
                       className="rounded-full object-cover"
                     />
                     <div>
-                      <p className="font-medium text-gray-800">{chat.name}</p>
-                      <p className="text-sm text-gray-500 truncate max-w-xs">{chat.message}</p>
+                      <p className="font-medium text-gray-800">{chat.firstName}</p>
+                      <p className="text-sm text-gray-500 truncate max-w-xs">{ chat.lastMessage}</p>
                     </div>
                   </div>
                   <div className="text-right text-sm text-gray-400 flex-shrink-0 flex items-center gap-2">
-                    <span>{chat.time}</span>
+         <span>{new Date(chat.timeStamp).toLocaleTimeString()}</span>
                     <ChevronRight size={18} />
                   </div>
                 </div>
