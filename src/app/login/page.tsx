@@ -40,14 +40,14 @@ const Page = () => {
     try {
       setLoading(true);
       const result = await login({ email, password });
+      console.log(result,typeof(result))
     if ("status" in result && result.status === 200) {
-        console.log(result)
         toast.success("Successfully logged in.");
         router.push("/dashboard");
       }
     } catch (error) {
       toast.error("Login failed")
-      console.log(error)
+      console.log("error is ",error)
     } finally {
       setLoading(false);
     }

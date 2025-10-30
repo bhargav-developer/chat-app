@@ -2,7 +2,7 @@
 
 import { useUserStore } from "@/lib/userStore";
 import { useRouter } from "next/navigation";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import {
   Bell,
   LogOut,
@@ -12,6 +12,7 @@ import Image from "next/image";
 import SplitText from "@/Components/AnimationText";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { logout } from "../apiEndPoints/auth";
 
 
 
@@ -36,13 +37,17 @@ export default function Home() {
     findRecentChats()
   }, [router])
 
-  const handleLogout = async () => {
-    const res = await axios.get("/api/auth/logOut");
-    console.log(res)
-    if (res) {
+const handleLogout = async () => {
+  try { 
+    const req = await logout();
+    if(req){
       router.push("/login")
     }
   }
+  catch (error) {
+    toast.error("an err occured")
+  }
+}
 
   const findRecentChats = async () => {
     try {

@@ -13,6 +13,7 @@ import { useUserStore } from '@/lib/userStore';
 import { useSocket } from '@/app/hooks/socketContext';
 import Avatar from './Avatar';
 import axios from 'axios';
+import { logout } from '@/app/apiEndPoints/auth';
 
 const SideBar = () => {
 
@@ -28,9 +29,13 @@ const SideBar = () => {
   const router = useRouter();
 
   const handleLogOut = async () => {
-    const res = await axios.get("/api/auth/logOut",{withCredentials: true});
-    if(res.status === 200){
-      router.push("/login")
+    try {
+      const req = await logout();
+      if(req){
+        router.push("/login")
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 

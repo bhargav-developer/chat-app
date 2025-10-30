@@ -1,33 +1,31 @@
 import { loginPayload, signupPayload } from "@/Interfaces/auth"
-import axios, { AxiosError } from "axios"
-import toast from "react-hot-toast"
+import axios, { AxiosError, AxiosResponse } from "axios"
 
-interface Response {
-    status: number,
-    message: string,
-}
-
-export const login = async (data: loginPayload): Promise<Response | Error> => {
+export const login = async (data: loginPayload): Promise<AxiosResponse | Error> => {
     try {
         const req = await axios.post(`/api/auth/login`, data, { withCredentials: true })
-        const res = {message: req.data, status: req.status }
-        return res
+        return req
     } catch (err) {
-          const error = err as AxiosError<Response>;
-        const message = error.response?.data?.message || "Login failed";
-        toast.error(message);
-        return err as Error;
+        throw err as Error;
     }
 
 }
 
-export const signUp = async (data: signupPayload): Promise<Response | Error> => {
+export const signUp = async (data: signupPayload): Promise<AxiosResponse | Error> => {
     try {
         const req = await axios.post(`/api/auth/signup`, data, { withCredentials: true })
-        const res = { message: req.data, status: req.status }
-        return res
+        return req;
     } catch (err) {
-        return err as Error;
+        throw err as Error
     }
 
 }
+
+ export const logout = async <AxiosResponse,Error>() => {
+    try {
+        const res = await axios.get("/api/auth/logOut");
+        return res
+    } catch (error) {
+        throw error as Error 
+    }
+  }
