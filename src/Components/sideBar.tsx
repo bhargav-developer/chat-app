@@ -1,6 +1,7 @@
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import React, { useEffect } from 'react'
+"use client";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
 import {
   HouseIcon,
   UserIcon,
@@ -8,56 +9,31 @@ import {
   UsersIcon,
   Settings,
   LogOutIcon,
+  Menu,
+  X,
 } from "lucide-react";
-import { useUserStore } from '@/lib/userStore';
-import { useSocket } from '@/app/hooks/socketContext';
-import Avatar from './Avatar';
-import axios from 'axios';
-import { logout } from '@/app/apiEndPoints/auth';
+import { useUserStore } from "@/lib/userStore";
+import { useSocket } from "@/app/hooks/socketContext";
+import Avatar from "./Avatar";
+import { logout } from "@/app/apiEndPoints/auth";
 
 const SideBar = () => {
-
-  const {user} = useUserStore();
-
-
-  interface BtnProps {
-    href: string;
-    name: string;
-    Icon: React.ComponentType<{ className?: string }>;
-  }
-
+  const { user } = useUserStore();
   const router = useRouter();
+  const pathname = usePathname();
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogOut = async () => {
     try {
       const req = await logout();
-      if(req){
-        router.push("/login")
-      }
+      if (req) router.push("/login");
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-
-
-  function Btn({ href, name, Icon }: BtnProps) {
-    const currentPath = usePathname();
-    const isActive = href === currentPath;
-
-    return (
-      <Link
-        href={href}
-        className={`flex gap-4 p-3 rounded-lg items-center transition-colors duration-150 ${isActive ? "bg-indigo-100 text-indigo-600" : "hover:bg-indigo-50"
-          }`}
-      >
-        <Icon className="text-xl" />
-        <h1 className="text-base">{name}</h1>
-      </Link>
-    );
-  }
-
-  const currentLinks = [
+  const links = [
     { name: "Dashboard", href: "/dashboard", Icon: HouseIcon },
     { name: "Profile", href: "/dashboard/profile", Icon: UserIcon },
     { name: "Conversations", href: "/dashboard/chats", Icon: MessageSquareText },
@@ -65,33 +41,88 @@ const SideBar = () => {
     { name: "Settings", href: "/dashboard/settings", Icon: Settings },
   ];
 
+  useSocket(user?.id || "");
 
-    useSocket(user?.id || "");
+  function NavBtn({ href, name, Icon }: any) {
+    const isActive = href === pathname;
+    return (
+      <Link
+        href={href}
+        className={`flex gap-4 p-3 rounded-lg items-center transition-colors duration-150 ${
+          isActive
+            ? "bg-indigo-100 text-indigo-600"
+            : "hover:bg-indigo-50 text-gray-700"
+        }`}
+        onClick={() => setIsOpen(false)} // close sidebar on mobile when link clicked
+      >
+        <Icon className="text-xl shrink-0" />
+        <h1 className="text-base">{name}</h1>
+      </Link>
+    );
+  }
 
   return (
-    <div className="w-[250px] fixed h-full bg-white text-black flex border-r border-gray-100 flex-col">
-      <div className="p-6 border-b border-gray-100">
-        <h2 className="font-bold text-indigo-600 text-2xl">Chat Sync</h2>
+    <>
+      {/* Top Bar for Mobile */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-100 fixed top-0 left-0 right-0 z-30">
+        <h2 className="font-bold text-indigo-600 text-xl">Chat Sync</h2>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="text-gray-700 hover:text-indigo-600"
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
-      <nav className="flex-1 p-3 gap-3 flex flex-col">
-        {currentLinks.map(({ href, name, Icon }) => (
-          <Btn key={href} href={href} name={name} Icon={Icon} />
-        ))}
-      </nav>
 
-      <div className="border-t overflow-hidden border-gray-100 flex gap-2 p-3 items-center">
-       <Avatar avatarUrl={user?.avatar}/>
-        <div>
-          <h1 className="font-bold text-base">{user?.name}</h1>
-          <p className="text-sm text-gray-600">{user?.email}</p>
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-100 flex flex-col transition-all duration-300 z-40
+          w-[250px] md:translate-x-0 ${
+            isOpen ? "translate-x-0" : "-translate-x-full"
+          } md:relative md:flex`}
+      >
+        {/* Header */}
+        <div className="p-6 border-b border-gray-100 hidden md:block">
+          <h2 className="font-bold text-indigo-600 text-2xl">Chat Sync</h2>
         </div>
-        <div onClick={handleLogOut} className='cursor-pointer'>
-        <LogOutIcon/>
-      </div>
-      </div>
-      
-    </div>
-  )
-}
 
-export default SideBar
+        {/* Nav Links */}
+        <nav className="flex-1 p-3 gap-3 flex flex-col overflow-y-auto">
+          {links.map((link) => (
+            <NavBtn key={link.href} {...link} />
+          ))}
+        </nav>
+
+        {/* User Info + Logout */}
+        <div className="border-t border-gray-100 flex items-center justify-between gap-2 p-3">
+          <div className="flex items-center gap-2">
+            <Avatar avatarUrl={user?.avatar} />
+            <div className="hidden md:block">
+              <h1 className="font-bold text-base truncate">{user?.name}</h1>
+              <p className="text-sm text-gray-600 truncate">{user?.email}</p>
+            </div>
+          </div>
+          <div
+            onClick={handleLogOut}
+            className="cursor-pointer hover:text-indigo-600 transition-colors"
+          >
+            <LogOutIcon size={20} />
+          </div>
+        </div>
+      </div>
+
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 md:hidden z-30"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Spacer for top bar (mobile only) */}
+      <div className="h-[64px] md:hidden" />
+    </>
+  );
+};
+
+export default SideBar;

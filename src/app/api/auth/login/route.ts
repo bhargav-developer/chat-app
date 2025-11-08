@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
   try {
     const data: loginPayload = await req.json();
 
+
     if (!data.email || !data.password) {
       return NextResponse.json({ message: "Please provide email and password." }, { status: 400 });
     }

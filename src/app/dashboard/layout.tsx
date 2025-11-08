@@ -1,5 +1,5 @@
 "use client";
-import {ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useUserStore } from "@/lib/userStore";
 import axios, { AxiosError } from "axios";
 import SideBar from "@/Components/sideBar";
@@ -21,78 +21,48 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [senderId, setSenderId] = useState<string | null>(null);
   const [recieveReq, setRecieveReq] = useState(false);
   const [recieverName, setRecieveName] = useState<string>("");
-  //  const [isOpen, setIsOpen] = useState(false);
-    const { statusMap, setStatus } = useUsersStore();
+  const { setStatus } = useUsersStore();
 
   useEffect(() => {
     getUserInfo();
   }, []);
 
-
   useEffect(() => {
     if (!socket) return;
 
-    // const handleMessage = (msg: any) => {
-    //   setMessages((prev: any) => [...prev, msg]);
-    // };
-
-    const handleFileTransferReq = (msg: {sender: string,senderId: string}) => {
+    const handleFileTransferReq = (msg: { sender: string; senderId: string }) => {
       if (msg.sender) {
-        setRecieveReq(true)
-        setRecieveName(msg.sender)
-        setSenderId(msg.senderId)
+        setRecieveReq(true);
+        setRecieveName(msg.sender);
+        setSenderId(msg.senderId);
       }
     };
 
     socket.on("update_users", (data) => {
-       Object.entries(data).forEach(([userId, statusData]) => {
+      Object.entries(data).forEach(([userId, statusData]) => {
         setStatus(userId, statusData);
       });
-      console.log("users",statusMap)
     });
 
-
-
-    // socket.on("file-transfer", () => {
-    //   setUplaod(true)
-    // })
-
-    // socket.on("receive-message", handleMessage);
     socket.on("file-transfer-request", handleFileTransferReq);
+
     return () => {
-      // socket.off("receive-message", handleMessage);
       socket.off("file-transfer-request", handleFileTransferReq);
     };
   }, [socket]);
 
-  const handleReqAccept = async () => {
-    try {
-      if (!socket) return;
-      setRecieve(true)
-      setRecieveReq(false)
-     socket.emit("accept-file-transfer", {
-        from: senderId
-      }) 
+  const handleReqAccept = () => {
+    if (!socket) return;
+    setRecieve(true);
+    setRecieveReq(false);
+    socket.emit("accept-file-transfer", { from: senderId });
+  };
 
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-
-    const handleReqReject = async () => {
-    try {
-      if (!socket) return;
-      setRecieve(true)
-      setRecieveReq(false)
-     socket.emit("accept-file-transfer", {
-        from: senderId
-      }) 
-
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const handleReqReject = () => {
+    if (!socket) return;
+    setRecieveReq(false);
+    // socket.emit("reject-file-transfer", { from: senderId });
+  };
 
   const getUserInfo = async () => {
     try {
@@ -105,34 +75,40 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         avatar,
       });
     } catch (error) {
-      console.error(error);
-      const err = error as AxiosError
-      if (err.status === 401) {
-        router.push("/login");
-      }
+      const err = error as AxiosError;
+      if (err.status === 401) router.push("/login");
     }
   };
 
   return (
-    <div className="flex h-full w-full">
+    <div className="relative flex h-screen w-full bg-white text-black overflow-hidden">
       {user?.id && <SideBar />}
+
       {/* Main content */}
-      <main className="flex-1 bg-white text-black ml-[250px] min-h-screen">
+      <main
+        className="
+          flex-1 min-h-screen 
+      
+          pt-[64px] md:pt-0
+          transition-all
+          overflow-y-auto
+        "
+      >
         {children}
-        {recieveReq &&
-          <div className='absolute h-full w-full'>
+
+        {/* Popup layers */}
+        {recieveReq && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-50">
             <ReqPopUp
               sender={recieverName}
               timeout={10}
               onAccept={handleReqAccept}
-              onReject={() => setRecieveReq(false)}
+              onReject={handleReqReject}
             />
           </div>
-        }
-        {
-          recieve && <FileRecieve onClose={() => setRecieve(false)} />
+        )}
 
-        }
+        {recieve && <FileRecieve onClose={() => setRecieve(false)} />}
       </main>
     </div>
   );

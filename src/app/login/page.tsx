@@ -60,12 +60,7 @@ const Page = () => {
         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
           {/* Header */}
           <div className="relative h-48 w-full">
-            <Image
-              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"
-              alt="Login Header"
-              fill
-              className="object-cover"
-            />
+      
             <div className="absolute inset-0 bg-gradient-to-b from-white/0 to-white/80 flex flex-col justify-end p-4">
               <h1 className="text-xl font-bold text-indigo-700">ChatSync</h1>
               <p className="text-sm text-indigo-500">Connect with clarity</p>

@@ -113,7 +113,6 @@ const Page = () => {
 
   const findRecentChats = async () => {
     try{
-      console.log("socketUrl: ",socketUrl)
       const res = await axios.get(`${socketUrl}/messages/chats`, {
         params: {
           userId: user?.id
