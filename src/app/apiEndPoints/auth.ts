@@ -24,7 +24,7 @@ export const signUp = async (data: signupPayload): Promise<AxiosResponse | Error
  export const logout = async <AxiosResponse,Error>() => {
     try {
         const res = await axios.get("/api/auth/logOut");
-        return res
+        return res;
     } catch (error) {
         throw error as Error 
     }

@@ -30,7 +30,7 @@ function page({ params }) {
 
   const handleDeleteClick = () => setIsOpen(true);
   const handleConfirmDelete = async () => {
-    const res = await axios.delete("http://localhost:4000/messages/deleteChat", {
+    const res = await axios.delete(`${socketUrl}/messages/deleteChat`, {
       params: { from: user.id }
     })
     if (res.data) {
@@ -189,10 +189,7 @@ function page({ params }) {
     }
   };
 
-  const something = (data) => {
-  console.log("lst seen ",data)
-    
-  }
+  
 
 
 

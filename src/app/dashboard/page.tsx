@@ -44,7 +44,8 @@ const handleLogout = async () => {
       router.push("/login")
     }
   }
-  catch (error) {
+  catch (error: Error | any) {
+    const errorMessage = error.message ? error.message : "an error occcured"
     toast.error("an err occured")
   }
 }
