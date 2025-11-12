@@ -27,7 +27,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
       console.log("file chunk", data)
     })
     return () => {
-      socket.off()
+      // socket.off()
     }
   }, [socket])
 

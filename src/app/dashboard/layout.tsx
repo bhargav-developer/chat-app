@@ -35,6 +35,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         setRecieveReq(true);
         setRecieveName(msg.sender);
         setSenderId(msg.senderId);
+      }else{
+        setRecieveReq(false)
       }
     };
 

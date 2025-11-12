@@ -13,6 +13,8 @@ import SplitText from "@/Components/AnimationText";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { logout } from "../apiEndPoints/auth";
+import Avatar from "@/Components/Avatar";
+import { useUsersStore } from "@/lib/usersStore";
 
 
 
@@ -31,24 +33,25 @@ export default function Home() {
   const router = useRouter();
   const [recentChats, setRecentChats] = useState<Chats[]>([]);
   const socketUrl = process.env.NEXT_PUBLIC_SOCKET;
+  const { statusMap, setStatus } = useUsersStore();
 
 
   useEffect(() => {
     findRecentChats()
   }, [router])
 
-const handleLogout = async () => {
-  try { 
-    const req = await logout();
-    if(req){
-      router.push("/login")
+  const handleLogout = async () => {
+    try {
+      const req = await logout();
+      if (req) {
+        router.push("/login")
+      }
+    }
+    catch (error: Error | any) {
+      const errorMessage = error.message ? error.message : "an error occcured"
+      toast.error("an err occured")
     }
   }
-  catch (error: Error | any) {
-    const errorMessage = error.message ? error.message : "an error occcured"
-    toast.error("an err occured")
-  }
-}
 
   const findRecentChats = async () => {
     try {
@@ -59,11 +62,11 @@ const handleLogout = async () => {
       })
       const data = await res.data;
       console.log(data)
-      if(data){
+      if (data) {
         setRecentChats(data);
       }
     } catch (error) {
-        console.log(error)
+      console.log(error)
     }
   }
 
@@ -145,23 +148,17 @@ const handleLogout = async () => {
             </div>
 
             <div className="space-y-4">
-              {recentChats && recentChats.map((chat,index) => (
+              {recentChats && recentChats.map((chat, index) => (
                 <div onClick={() => router.push(`/dashboard/chats/${chat.userId}`)} key={index} className="flex items-center justify-between hover:bg-gray-50 p-2 rounded-md transition">
                   <div className="flex items-center gap-4">
-                    <img
-                      src={chat.avatar}
-                      alt={chat.firstName}
-                      width={40}
-                      height={40}
-                      className="rounded-full object-cover"
-                    />
+                    <Avatar avatarUrl={chat.avatar} isOnline={statusMap.get(chat.userId)?.online} />
                     <div>
                       <p className="font-medium text-gray-800">{chat.firstName}</p>
-                      <p className="text-sm text-gray-500 truncate max-w-xs">{ chat.lastMessage}</p>
+                      <p className="text-sm text-gray-500 truncate max-w-xs">{chat.lastMessage}</p>
                     </div>
                   </div>
                   <div className="text-right text-sm text-gray-400 flex-shrink-0 flex items-center gap-2">
-         <span>{new Date(chat.timeStamp).toLocaleTimeString()}</span>
+                    <span>{new Date(chat.timeStamp).toLocaleTimeString()}</span>
                     <ChevronRight size={18} />
                   </div>
                 </div>

@@ -214,7 +214,7 @@ function page({ params }) {
             <h1>{`${User.firstName} ${User.lastName}`}</h1>
             {
               statusMap.get(User._id)?.online ? <span className="text-green-500 text-sm mt-1">● Online</span> : 
-              <span className="text-gray-500 text-sm mt-1">{something(statusMap.get(User._id)?.lastSeen)}</span> 
+              <span className="text-gray-500 text-sm mt-1">{statusMap.get(User._id)?.lastSeen}</span> 
             }
           </div>
         </div>
@@ -316,8 +316,6 @@ function page({ params }) {
         upload && <FileUpload reciverId={User._id} onClose={() => setUplaod(false)} />
 
       }
-
-
 
     </div>
 
