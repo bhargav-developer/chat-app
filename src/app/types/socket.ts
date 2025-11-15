@@ -9,10 +9,12 @@ export interface ServerToClientEvents {
     file: string;
     size: number;
   }>) => void;
-   "recieve-file-chunk": (data: {}) => void;
-   "update_users": (data: Object) => void;
-    "file-transfer-request": (data: any) => void ;
-     "file-transfer-end": (data: any) => void ;
+  "recieve-file-chunk": (data: {}) => void;
+  "update_users": (data: Object) => void;
+  "receiver-file-transfer-request": (data: any) => void;
+  "file-transfer-end": (data: any) => void;
+  "rejected-file-transfer": (data: any) => void;
+
 }
 
 export interface ClientToServerEvents {
@@ -21,10 +23,11 @@ export interface ClientToServerEvents {
     content: string;
   }) => void;
 
-  "file-meta": (data: {name: string,fileType: string,size: number,reciverId: string}) => void;
+  "file-meta": (data: { name: string, fileType: string, size: number, reciverId: string }) => void;
   "send-file-chunk": (data: {}) => void;
   "file-end": (data: {}) => void;
   "accept-file-transfer": (data: any) => void;
+  "reject-file-transfer": (data: any) => void;
 
   'join': (userId: string) => void;
 }

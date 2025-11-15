@@ -127,9 +127,9 @@ function page({ params }) {
 
   const handleFileSender = async () => {
     try {
-      const res = socket.emit("file-transfer-request", {
-        sender: user.id,
-        reciever: User._id,
+      const res = socket.emit("sender-file-transfer-req", {
+        senderId: user.id,
+        receiverId: User._id,
         name: user.name
       })
       console.log(res)
