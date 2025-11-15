@@ -6,9 +6,9 @@ import { ClientToServerEvents, ServerToClientEvents } from "../types/socket";
 export const useSocket = (userId: string) => {
   const setSocket = useSocketStore((state) => state.setSocket);
   const clearSocket = useSocketStore((state) => state.clearSocket);
-
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET
   useEffect(() => {
-    const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://localhost:4000");
+    const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`${socketUrl}`);
 
     setSocket(socket);
 
