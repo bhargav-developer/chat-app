@@ -21,7 +21,7 @@ export interface ClientToServerEvents {
     content: string;
   }) => void;
 
-  "file-meta": (data: {name: string,size: number,reciverId: string}) => void;
+  "file-meta": (data: {name: string,fileType: string,size: number,reciverId: string}) => void;
   "send-file-chunk": (data: {}) => void;
   "file-end": (data: {}) => void;
   "accept-file-transfer": (data: any) => void;

@@ -57,6 +57,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
     socket.emit("file-meta", {
       name: file.name,
       size: file.size,
+      fileType: file.type,
       reciverId,
     });
     
@@ -73,7 +74,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
           
           // Send the chunk over the socket
           socket.emit("send-file-chunk", {
-            name: id, // Use the unique ID for receiver tracking
+            name: file.name, // Use the unique ID for receiver tracking
             buffer,
             reciverId,
           });

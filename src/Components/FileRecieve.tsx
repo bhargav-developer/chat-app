@@ -29,10 +29,10 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
 
     const fileChunks = fileChunksRef.current; // Get the current map reference
 
-    // 1. Handle file metadata announcement
+    
     socket.on("meta-transfer", (data: any[]) => {
       const fileData = data.map((f: any) => {
-        // Initialize an empty array for chunks in the Map
+      
         fileChunks.set(f.file, []); 
         return {
           file: f.file,
@@ -45,63 +45,56 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
       setFiles(fileData);
     });
 
-    // 2. Handle incoming file chunks
-    socket.on("recieve-file-chunk", (data: any) => {
-      const { name, chunk } = data;
-      // Convert the incoming chunk (e.g., ArrayBuffer) to Uint8Array
-      const arrChunk = new Uint8Array(chunk);
+   socket.on("recieve-file-chunk", (data: any) => {
+  const { file, chunk } = data;
+  const arrChunk = new Uint8Array(chunk);
 
-      
-      const chunks = fileChunks.get(name);
-      console.log("chunks: ",chunks)
-      if (chunks) chunks.push(arrChunk);
+  const chunks = fileChunks.get(file);
+  console.log("is chunks",fileChunks)
+  if (!chunks) return console.warn("Chunk received before metadata:", file);
 
-      // Update progress state for the specific file
-      setFiles(prev =>
-        prev.map(f => {
-          if (f.file !== name) return f;
-
-          const newBytes = f.receivedBytes + arrChunk.byteLength;
-          // Ensure progress calculation handles potential zero size edge case gracefully
-          const progress = f.size > 0 ? Math.round((newBytes / f.size) * 100) : 100;
-          console.log(progress)
-          
-          return { ...f, receivedBytes: newBytes, progress };
-        })
-      );
-    });
-
-    // 3. Handle transfer completion
-    socket.on("file-transfer-end", (data: any) => {
-      const { name, fileType } = data;
-      const chunks = fileChunks.get(name);
-      
+  chunks.push(arrChunk);
 
 
-      
-      // FIX: Use a type assertion (as BlobPart[]) to satisfy the Blob constructor's typing
-      const blob = new Blob(chunks as BlobPart[], {
-        type: fileType || "application/octet-stream"
-      });
-      const url = URL.createObjectURL(blob);
-      
-      
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = name;
-      a.click();
-      URL.revokeObjectURL(url); // Clean up the temporary URL
 
-      fileChunks.delete(name);
-      setFiles(prev => prev.filter(f => f.file !== name));
-    });
+  setFiles(prev =>
+    prev.map(f =>
+      f.file === file
+        ? {
+            ...f,
+            receivedBytes: f.receivedBytes + arrChunk.byteLength,
+            progress: Math.round(((f.receivedBytes + arrChunk.byteLength) / f.size) * 100),
+          }
+        : f
+    )
+  );
+});
+
+
+socket.on("file-transfer-end", (data: any) => {
+ 
+  const { file, fileType } = data;
+  const chunks = fileChunks.get(file);
+
+
+  const blob = new Blob(chunks as BlobPart[], { type: fileType || "application/octet-stream" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = file;
+  a.click();
+
+  URL.revokeObjectURL(a.href);
+  fileChunks.delete(file);
+
+  setFiles(prev => prev.filter(f => f.file !== file));
+});
 
     // Cleanup function to remove event listeners on component unmount
-    // return () => {
-    //   socket.off("meta-transfer");
-    //   socket.off("recieve-file-chunk");
-    //   socket.off("file-transfer-end");
-    // };
+    return () => {
+      socket.off("meta-transfer");
+      socket.off("recieve-file-chunk");
+      socket.off("file-transfer-end");
+    };
   }, [socket]); // Depend on socket to re-run effect if it changes
 
   // Helper function to format bytes to MB
@@ -148,10 +141,10 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
                 <div className="w-full bg-gray-200 h-2 rounded">
                   <div
                     className="h-full bg-green-500 rounded"
-                    style={{ width: `${file.progress | progress}%` }}
+                    style={{ width: `${file.progress}%` }}
                   />
                 </div>
-                <p className="text-xs text-gray-600">{progress}%</p>
+                <p className="text-xs text-gray-600">{file.progress}%</p>
               </div>
             ))}
 
