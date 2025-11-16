@@ -38,7 +38,7 @@ export default function Home() {
 
   useEffect(() => {
     findRecentChats()
-  }, [router])
+  }, [user])
 
   const handleLogout = async () => {
     try {
@@ -55,9 +55,11 @@ export default function Home() {
 
   const findRecentChats = async () => {
     try {
+      const userId = user?.id
+      console.log("user id ",userId)
       const res = await axios.get(`${socketUrl}/messages/chats`, {
         params: {
-          userId: user?.id
+          userId
         }
       })
       const data = await res.data;

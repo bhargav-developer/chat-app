@@ -8,7 +8,7 @@ import { useUsersStore } from "@/lib/usersStore";
 import ReqPopUp from "@/Components/ReqPopUp";
 import FileRecieve from "@/Components/FileRecieve";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -51,7 +51,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     socket.on("receiver-file-transfer-request", handleFileTransferReq);
     socket.on("rejected-file-transfer",(data) => {
-      toast.error(`${data.userName ?  `${data.userName} rejected Your file request` : "file transfer request has been rejected" }`)
+      toast.error(`${data ?  `${data} rejected Your file request` : "file transfer request has been rejected" }`)
     })
 
     return () => {
@@ -90,7 +90,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="relative flex h-screen w-full bg-white text-black overflow-hidden">
-      <Toaster/>
+
       {user?.id && <SideBar />}
 
       {/* Main content */}
