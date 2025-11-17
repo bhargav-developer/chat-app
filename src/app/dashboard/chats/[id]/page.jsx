@@ -199,130 +199,127 @@ function page({ params }) {
   if (!user?.id || !User?._id) {
     return <div className="p-4">Loading chat...</div>;
   }
-
-  return (
-    <div className="flex h-full flex-col">
-      <div className="flex p-4 border-b border-gray-100 justify-between">
-        <div className="flex gap-3">
-          <div
-            onClick={() => router.back()}
-            className="flex cursor-pointer justify-center items-center"
-          >
-            <ArrowLeftCircleIcon className="text-indigo-500" />
-          </div>
-          <div className="relative">
-            <Avatar avatarUrl={User.avatar} />
-          </div>
-          <div>
-            <h1>{`${User.firstName} ${User.lastName}`}</h1>
-            {
-              statusMap.get(User._id)?.online ? <span className="text-green-500 text-sm mt-1">● Online</span> : 
-              <span className="text-gray-500 text-sm mt-1">lastSeen: {formatDateGroup(statusMap.get(User._id)?.lastSeen)}</span> 
-            }
-          </div>
-        </div>
-        <div className="flex gap-2 justify-between items-centers">
-          <Trash2Icon className='hover:text-indigo-500 cursor-pointer' onClick={handleDeleteClick} />
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="bg-gray-50 overflow-auto pt-2 flex-1 gap-3 text-white px-4 flex-col flex">
-        {messages.map((msg, index) => (
-          <div key={index}>
-            <div
-              className={`flex ${msg.from === user.id ? "justify-end" : "justify-start"}`}
-            >
-
-              {msg.from !== user.id && (
-                <img className="h-8 w-8" src={User.avatar} alt="" />
-              )}
-              <div
-                className={`p-3 ${msg.from === user.id
-                  ? "bg-blue-600 rounded-2xl rounded-tr-md"
-                  : "border border-gray-500 rounded-2xl rounded-tl-md text-black"
-                  } max-w-xs`}
-              >
-                {msg.content || msg}
-              </div>
-            </div>
-            <p className={`text-gray-500 ${msg.from === user.id ? 'text-right' : 'text-left ml-10'} text-sm`}>
-              {formatAMPM(msg.timeStamp)}
-            </p>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-
-      {/* Input */}
-      <div className="border-t relative p-3 gap-3 mb-2 flex border-gray-100 items-center w-full">
+return (
+  <div className="flex h-full flex-col">
+    {/* Header */}
+    <div className="flex p-2 sm:p-4 border-b border-gray-200 justify-between items-center">
+      <div className="flex gap-2 sm:gap-3 items-center min-w-0">
         <button
-          type="button"
-          className="cursor-pointer p-2"
-          onClick={handleFileSender}
+          onClick={() => router.back()}
+          className="flex cursor-pointer justify-center items-center"
         >
-          <Link2Icon />
+          <ArrowLeftCircleIcon className="text-indigo-500 w-6 h-6 sm:w-7 sm:h-7" />
         </button>
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="border border-gray-400 flex-1 p-2 rounded-xl"
-          placeholder="Type Your Message"
+
+        <div className="relative">
+          <Avatar avatarUrl={User.avatar} className="w-8 h-8 sm:w-10 sm:h-10" />
+        </div>
+
+        <div className="truncate">
+          <h1 className="font-semibold text-sm sm:text-base truncate">
+            {`${User.firstName} ${User.lastName}`}
+          </h1>
+
+          {statusMap.get(User._id)?.online ? (
+            <span className="text-green-500 text-xs sm:text-sm mt-1">● Online</span>
+          ) : (
+            <span className="text-gray-500 text-xs sm:text-sm mt-1">
+              lastSeen: {formatDateGroup(statusMap.get(User._id)?.lastSeen)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex gap-3 items-center">
+        <Trash2Icon
+          className="hover:text-indigo-500 cursor-pointer w-5 h-5 sm:w-6 sm:h-6"
+          onClick={handleDeleteClick}
         />
-        <button className='cursor-pointer' onClick={() => setShowPicker(!showPicker)}>
-          <SmileIcon />
-        </button>
-        <button
-          className="bg-indigo-600 p-3 cursor-pointer rounded-2xl"
-          onClick={sendMessage}
-        >
-          <SendHorizontalIcon className="text-white" />
-        </button>
       </div>
-
-      <div className='absolute bottom-0 right-0' onMouseLeave={() => setShowPicker(false)}>
-        {showPicker && (
-          <EmojiPickerComponent
-            onEmojiClick={(emoji) => setMessage((prev) => prev + emoji)}
-          />
-        )}
-      </div>
-
-
-
-      {isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md transition-opacity duration-300 z-50">
-          <div className="bg-white p-6 rounded shadow-md">
-            <h2 className="text-lg font-bold mb-4">Confirm Deletion</h2>
-            <p className="mb-4">Are you sure you want to delete this conversation?</p>
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="px-4 py-2 cursor-pointer bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmDelete}
-                className="px-4 py-2 cursor-pointer bg-indigo-500 text-white rounded hover:bg-indigo-600"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {
-        upload && <FileUpload reciverId={User._id} onClose={() => setUplaod(false)} />
-
-      }
-
     </div>
 
-  );
+    {/* Messages */}
+    <div className="bg-gray-50 overflow-auto pt-2 flex-1 gap-3 text-white px-2 sm:px-4 flex flex-col">
+      {messages.map((msg, index) => (
+        <div key={index}>
+          <div
+            className={`flex ${
+              msg.from === user.id ? "justify-end" : "justify-start"
+            }`}
+          >
+            {msg.from !== user.id && (
+              <img
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-full"
+                src={User.avatar}
+                alt=""
+              />
+            )}
+
+            <div
+              className={`p-2 sm:p-3 ${
+                msg.from === user.id
+                  ? "bg-blue-600 text-white rounded-2xl rounded-tr-md"
+                  : "border border-gray-400 text-black rounded-2xl rounded-tl-md"
+              } max-w-[80%] sm:max-w-xs break-words`}
+            >
+              {msg.content || msg}
+            </div>
+          </div>
+
+          <p
+            className={`text-gray-500 text-[10px] sm:text-xs ${
+              msg.from === user.id
+                ? "text-right"
+                : "text-left ml-10"
+            }`}
+          >
+            {formatAMPM(msg.timeStamp)}
+          </p>
+        </div>
+      ))}
+      <div ref={messagesEndRef} />
+    </div>
+
+    {/* Input */}
+    <div className="border-transparent bg-white p-2 sm:p-3 gap-2 flex items-center w-full">
+      <button type="button" className="cursor-pointer p-2" onClick={handleFileSender}>
+        <Link2Icon className="" />
+      </button>
+
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        className="border border-gray-400 flex-1 sm:w-[100%] w-[1vw] p-2 rounded-xl text-sm"
+        placeholder="Type your message..."
+      />
+
+      <button className="cursor-pointer hidden sm:block p-2" onClick={() => setShowPicker(!showPicker)}>
+        <SmileIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+      </button>
+
+      <button
+        className="bg-indigo-600 p-2 sm:p-3 rounded-xl cursor-pointer"
+        onClick={sendMessage}
+      >
+        <SendHorizontalIcon className="text-white w-5 h-5 sm:w-6 sm:h-6" />
+      </button>
+    </div>
+
+    {/* Emoji Picker */}
+    <div
+      className="absolute bottom-14 right-2 sm:bottom-16 sm:right-4 z-50"
+      onMouseLeave={() => setShowPicker(false)}
+    >
+      {showPicker && (
+        <EmojiPickerComponent
+          onEmojiClick={(emoji) => setMessage((prev) => prev + emoji)}
+        />
+      )}
+    </div>
+  </div>
+);
+
 }
 
 export default page;

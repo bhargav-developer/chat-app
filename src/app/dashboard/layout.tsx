@@ -102,11 +102,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main content */}
       <main
         className="
-          flex-1 min-h-screen 
-      
+          flex-1 min-h-screen max-w-screen
           pt-[64px] md:pt-0
           transition-all
-          overflow-y-auto
         "
       >
         {children}
