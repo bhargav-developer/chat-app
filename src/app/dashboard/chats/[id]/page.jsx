@@ -4,6 +4,7 @@ import EmojiPickerComponent from '@/Components/EmojiPicker'
 import FileRecieve from '@/Components/FileRecieve'
 import FileUpload from '@/Components/FileUpload'
 import ReqPopUp from '@/Components/ReqPopUp'
+import { fileTransferStore } from '@/lib/fileTransferStore'
 import { useSocketStore } from '@/lib/socketStore'
 import { useUsersStore } from '@/lib/usersStore'
 import { useUserStore } from '@/lib/userStore'
@@ -25,6 +26,7 @@ function page({ params }) {
   const [upload, setUplaod] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
   const { statusMap, setStatus } = useUsersStore();
+  const {setRoomId} = fileTransferStore();
   const socketUrl = process.env.NEXT_PUBLIC_SOCKET
 
 
@@ -99,8 +101,9 @@ function page({ params }) {
 
 
 
-    socket.on("file-transfer", () => {
+    socket.on("file-transfer", (roomId) => {
       setUplaod(true)
+      setRoomId(roomId)
     })
 
     socket.on("receive-message", handleMessage);

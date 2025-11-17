@@ -9,6 +9,7 @@ import ReqPopUp from "@/Components/ReqPopUp";
 import FileRecieve from "@/Components/FileRecieve";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { fileTransferStore } from "@/lib/fileTransferStore";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -21,13 +22,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [recieve, setRecieve] = useState(false);
   const [senderId, setSenderId] = useState<string | null>(null);
   const [recieveReq, setRecieveReq] = useState(false);
-  const [roomId,setRoomId] = useState<string | null>(null)
+  const {roomId,setRoomId} = fileTransferStore();
   const [recieverName, setRecieveName] = useState<string>("");
   const { setStatus } = useUsersStore();
 
   useEffect(() => {
     getUserInfo();
   }, []);
+
+  useEffect(() => {
+    console.log(roomId)
+  }, [roomId]);
 
   useEffect(() => {
     if (!socket) return;
@@ -63,6 +68,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     if (!socket) return;
     socket.emit("accept-file-transfer", {  senderId,roomId,reciverId: user?.id });
     setRecieve(true);
+    setRoomId(roomId)
     setRecieveReq(false);
   };
 

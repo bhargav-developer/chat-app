@@ -14,7 +14,7 @@ export interface ServerToClientEvents {
   "receiver-file-transfer-request": (data: any) => void;
   "file-transfer-end": (data: any) => void;
   "rejected-file-transfer": (data: any) => void;
-
+  "close-file-transfer": (data: any) => void;
 }
 
 export interface ClientToServerEvents {
@@ -28,6 +28,6 @@ export interface ClientToServerEvents {
   "file-end": (data: {}) => void;
   "accept-file-transfer": (data: any) => void;
   "reject-file-transfer": (data: any) => void;
-
+  "close-file-transfer": (data: any) => void;
   'join': (userId: string) => void;
 }

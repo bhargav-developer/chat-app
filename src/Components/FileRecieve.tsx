@@ -1,3 +1,4 @@
+import { fileTransferStore } from '@/lib/fileTransferStore';
 import { useSocketStore } from '@/lib/socketStore';
 import { FileIcon, X } from 'lucide-react';
 import React, { useEffect, useState, useRef } from 'react';
@@ -20,20 +21,24 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   const socket = useSocketStore((state) => state.socket);
 
   const [files, setFiles] = useState<ReceivedFile[]>([]);
-  const [progress,setProgress] = useState<number>(0)
+  const [progress, setProgress] = useState<number>(0)
   // Using useRef to store the binary chunks Map, which prevents unnecessary re-renders.
   const fileChunksRef = useRef<Map<string, Uint8Array[]>>(new Map());
+  const { roomId } = fileTransferStore();
+
+
+
 
   useEffect(() => {
     if (!socket) return;
 
     const fileChunks = fileChunksRef.current; // Get the current map reference
 
-    
+
     socket.on("meta-transfer", (data: any[]) => {
       const fileData = data.map((f: any) => {
-      
-        fileChunks.set(f.file, []); 
+
+        fileChunks.set(f.file, []);
         return {
           file: f.file,
           size: f.size,
@@ -45,55 +50,62 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
       setFiles(fileData);
     });
 
-   socket.on("recieve-file-chunk", (data: any) => {
-  const { file, chunk } = data;
-  const arrChunk = new Uint8Array(chunk);
+    socket.on("recieve-file-chunk", (data: any) => {
+      const { file, chunk } = data;
+      const arrChunk = new Uint8Array(chunk);
 
-  const chunks = fileChunks.get(file);
-  console.log("is chunks",fileChunks)
-  if (!chunks) return console.warn("Chunk received before metadata:", file);
+      const chunks = fileChunks.get(file);
+      console.log("is chunks", fileChunks)
+      if (!chunks) return console.warn("Chunk received before metadata:", file);
 
-  chunks.push(arrChunk);
-
-
-
-  setFiles(prev =>
-    prev.map(f =>
-      f.file === file
-        ? {
-            ...f,
-            receivedBytes: f.receivedBytes + arrChunk.byteLength,
-            progress: Math.round(((f.receivedBytes + arrChunk.byteLength) / f.size) * 100),
-          }
-        : f
-    )
-  );
-});
+      chunks.push(arrChunk);
 
 
-socket.on("file-transfer-end", (data: any) => {
- 
-  const { file, fileType } = data;
-  const chunks = fileChunks.get(file);
+
+      setFiles(prev =>
+        prev.map(f =>
+          f.file === file
+            ? {
+              ...f,
+              receivedBytes: f.receivedBytes + arrChunk.byteLength,
+              progress: Math.round(((f.receivedBytes + arrChunk.byteLength) / f.size) * 100),
+            }
+            : f
+        )
+      );
+    });
+
+   
+
+    socket.on("file-transfer-end", (data: any) => {
+
+      const { file, fileType } = data;
+      const chunks = fileChunks.get(file);
 
 
-  const blob = new Blob(chunks as BlobPart[], { type: fileType || "application/octet-stream" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = file;
-  a.click();
+      const blob = new Blob(chunks as BlobPart[], { type: fileType || "application/octet-stream" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = file;
+      a.click();
 
-  URL.revokeObjectURL(a.href);
-  fileChunks.delete(file);
+      URL.revokeObjectURL(a.href);
+      fileChunks.delete(file);
 
-  setFiles(prev => prev.filter(f => f.file !== file));
-});
+      setFiles(prev => prev.filter(f => f.file !== file));
+    });
+
+     socket.on("close-file-transfer", () => {
+      console.log("got a req to close on reciver")
+      onClose()
+    })
 
     // Cleanup function to remove event listeners on component unmount
     return () => {
       socket.off("meta-transfer");
       socket.off("recieve-file-chunk");
       socket.off("file-transfer-end");
+       socket.off("close-file-transfer");
     };
   }, [socket]); // Depend on socket to re-run effect if it changes
 
@@ -103,12 +115,18 @@ socket.on("file-transfer-end", (data: any) => {
     return `${mb.toFixed(2)} MB`;
   };
 
+  const handleClose = () => {
+    if (!socket) return
+    socket.emit("close-file-transfer", { roomId })
+    onClose()
+  }
+
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white relative w-full max-w-4xl rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col md:flex-row gap-8">
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute cursor-pointer top-[-30px] right-[-30px] text-white border border-white rounded transition-all hover:rounded-[50%] duration-300 p-1"
         >
           <X className="w-5 h-5" />

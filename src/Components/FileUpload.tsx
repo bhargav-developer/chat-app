@@ -1,17 +1,18 @@
 'use client';
+import { fileTransferStore } from '@/lib/fileTransferStore';
 // FIX: Using relative path to resolve compilation error
-import { useSocketStore } from '../lib/socketStore'; 
+import { useSocketStore } from '../lib/socketStore';
 import {
   FileIcon,
   TrashIcon,
   UploadIcon,
   X,
 } from 'lucide-react';
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 // Removed unused imports: useSocket, axios, useEffect
 
 // Define the chunk size (e.g., 64KB)
-const CHUNK_SIZE = 1024 * 64; 
+const CHUNK_SIZE = 1024 * 64;
 
 interface FileUploadProps {
   onClose: () => void;
@@ -30,10 +31,23 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
   const [files, setFiles] = useState<FileUploadStatus[]>([]);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
   const socket = useSocketStore((state) => state.socket);
+  const {roomId} = fileTransferStore();
 
   const handleBrowseClick = () => {
     inputFileRef.current?.click();
   };
+
+  useEffect(() => {
+    if (!socket) return
+  socket.on("close-file-transfer", () => {
+         console.log("got a req to close on sender")
+      onClose()
+    })
+
+
+  
+
+  }, [socket])
 
   const updateFileStatus = useCallback(
     (id: string, updates: Partial<FileUploadStatus>) => {
@@ -50,9 +64,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
       return;
     }
     const { file, id } = uploadStatus;
-    
+
     let offset = 0;
-    
+
     // 1. Send file metadata (using unique ID 'id' as 'name' for tracking)
     socket.emit("file-meta", {
       name: file.name,
@@ -60,7 +74,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
       fileType: file.type,
       reciverId,
     });
-    
+
     updateFileStatus(id, { status: 'uploading' });
 
     // 2. Loop through file chunks
@@ -71,7 +85,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
       await new Promise<void>((resolve) => {
         reader.onload = () => {
           const buffer = new Uint8Array(reader.result as ArrayBuffer);
-          
+
           // Send the chunk over the socket
           socket.emit("send-file-chunk", {
             name: file.name, // Use the unique ID for receiver tracking
@@ -92,7 +106,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
         };
         reader.readAsArrayBuffer(chunk);
       });
-      
+
       // Stop transfer if failure is detected
       const currentStatus = files.find(f => f.id === id)?.status;
       if (currentStatus === 'failed') break;
@@ -128,12 +142,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
     // Start upload for each file
     for (const uploadStatus of newUploads) {
       // Execute the async upload function without awaiting to allow concurrent uploads
-      startFileUpload(uploadStatus); 
+      startFileUpload(uploadStatus);
     }
 
     // Clear the input value so the same file can be selected again
     if (inputFileRef.current) {
-        inputFileRef.current.value = '';
+      inputFileRef.current.value = '';
     }
   };
 
@@ -161,12 +175,18 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
     }
   };
 
+  const handleClose = () => {
+    if(!socket) return
+    socket.emit("close-file-transfer",{roomId})
+    onClose()
+  }
+
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white relative w-full max-w-4xl rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col md:flex-row gap-8">
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           aria-label="Close upload window"
           className="absolute cursor-pointer top-[-30px] right-[-30px] text-white border border-white rounded transition-all hover:rounded-[50%] duration-300 p-1"
         >
@@ -225,7 +245,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* Remove button (only show for pending/failed files) */}
                   {statusItem.status !== 'uploading' && (
                     <TrashIcon
@@ -248,7 +268,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
                 </p>
               </div>
             ))}
-            
+
             {files.length === 0 && (
               <p className="text-gray-400 italic">No files selected yet.</p>
             )}
