@@ -97,7 +97,7 @@ const SideBar = () => {
         <div className="border-t border-gray-100 flex items-center justify-between gap-2 p-3">
           <div className="flex items-center gap-2">
             <Avatar avatarUrl={user?.avatar} />
-            <div className="hidden md:block">
+            <div className="md:block">
               <h1 className="font-bold text-base truncate">{user?.name}</h1>
               <p className="text-sm text-gray-600 truncate">{user?.email}</p>
             </div>

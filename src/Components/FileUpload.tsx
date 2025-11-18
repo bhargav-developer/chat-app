@@ -43,10 +43,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
          console.log("got a req to close on sender")
       onClose()
     })
-
-
-  
-
   }, [socket])
 
   const updateFileStatus = useCallback(

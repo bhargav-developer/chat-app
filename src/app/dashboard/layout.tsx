@@ -10,6 +10,7 @@ import FileRecieve from "@/Components/FileRecieve";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { fileTransferStore } from "@/lib/fileTransferStore";
+import FileUpload from "@/Components/FileUpload";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -21,8 +22,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const socket = useSocketStore((state) => state.socket);
   const [recieve, setRecieve] = useState(false);
   const [senderId, setSenderId] = useState<string | null>(null);
+  const { upload, setUpload } = fileTransferStore();
   const [recieveReq, setRecieveReq] = useState(false);
-  const {roomId,setRoomId} = fileTransferStore();
+  const { roomId, setRoomId } = fileTransferStore();
   const [recieverName, setRecieveName] = useState<string>("");
   const { setStatus } = useUsersStore();
 
@@ -43,7 +45,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         setRecieveName(msg.senderName);
         setSenderId(msg.senderId);
         setRoomId(msg.roomId)
-      }else{
+      } else {
         setRecieveReq(false)
       }
     };
@@ -55,8 +57,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     });
 
     socket.on("receiver-file-transfer-request", handleFileTransferReq);
-    socket.on("rejected-file-transfer",(data) => {
-      toast.error(`${data ?  `${data} rejected Your file request` : "file transfer request has been rejected" }`)
+    socket.on("rejected-file-transfer", (data) => {
+      toast.error(`${data ? `${data} rejected Your file request` : "file transfer request has been rejected"}`)
     })
 
     return () => {
@@ -66,7 +68,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const handleReqAccept = () => {
     if (!socket) return;
-    socket.emit("accept-file-transfer", {  senderId,roomId,reciverId: user?.id });
+    socket.emit("accept-file-transfer", { senderId, roomId, reciverId: user?.id });
     setRecieve(true);
     setRoomId(roomId)
     setRecieveReq(false);
@@ -75,7 +77,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const handleReqReject = () => {
     if (!socket) return;
     setRecieveReq(false);
-    socket.emit("reject-file-transfer", { from: senderId,roomId,userName: user?.name });
+    socket.emit("reject-file-transfer", { from: senderId, roomId, userName: user?.name });
   };
 
   const getUserInfo = async () => {
@@ -122,6 +124,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         )}
 
         {recieve && <FileRecieve onClose={() => setRecieve(false)} />}
+       
       </main>
     </div>
   );

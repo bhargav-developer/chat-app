@@ -23,7 +23,7 @@ function page({ params }) {
   const socket = useSocketStore((state) => state.socket);
   const messagesEndRef = React.useRef(null);
   const [showPicker, setShowPicker] = React.useState(false);;
-  const [upload, setUplaod] = React.useState(false);
+  const {upload, setUpload} = fileTransferStore();
   const [isOpen, setIsOpen] = React.useState(false);
   const { statusMap, setStatus } = useUsersStore();
   const {setRoomId} = fileTransferStore();
@@ -43,10 +43,13 @@ function page({ params }) {
   };
 
   const formatDateGroup = (timestamp) => {
+    if(!timestamp) return
+    console.log(timestamp)
     const now = new Date();
     const input = new Date(timestamp);
 
-    // Set all to midnight for comparison
+    // Set all to midnight for
+    //  comparison
     const today = new Date(now.setHours(0, 0, 0, 0));
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
@@ -79,9 +82,9 @@ function page({ params }) {
     }
   }, [User, user]);
 
-  React.useEffect(() => {
-    console.log(statusMap)
-  }, [statusMap])
+  // React.useEffect(() => {
+  //   console.log(statusMap)
+  // }, [statusMap])
   // Socket listener
   React.useEffect(() => {
     if (!socket) return;
@@ -102,7 +105,8 @@ function page({ params }) {
 
 
     socket.on("file-transfer", (roomId) => {
-      setUplaod(true)
+      if(upload) return
+      setUpload(true)
       setRoomId(roomId)
     })
 
@@ -305,6 +309,8 @@ return (
         <SendHorizontalIcon className="text-white w-5 h-5 sm:w-6 sm:h-6" />
       </button>
     </div>
+
+     {upload && <FileUpload onClose={() => {setUpload(false)}} reciverId={User._id} />}
 
     {/* Emoji Picker */}
     <div
