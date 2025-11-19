@@ -184,7 +184,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, reciverId }) => {
         <button
           onClick={handleClose}
           aria-label="Close upload window"
-          className="absolute cursor-pointer top-[-30px] right-[-30px] text-white border border-white rounded transition-all hover:rounded-[50%] duration-300 p-1"
+          className="absolute cursor-pointer top-[-50px] right-[-10px] md:top-[-30px] md:right-[-30px] text-white border border-white rounded transition-all hover:rounded-[50%] duration-300 p-1"
         >
           <X className="w-5 h-5" />
         </button>

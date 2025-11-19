@@ -127,7 +127,7 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute cursor-pointer top-[-30px] right-[-30px] text-white border border-white rounded transition-all hover:rounded-[50%] duration-300 p-1"
+          className="absolute cursor-pointer top-[-50px] right-[-10px] md:top-[-30px] md:right-[-30px] text-white border border-white rounded transition-all hover:rounded-[50%] duration-300 p-1"
         >
           <X className="w-5 h-5" />
         </button>

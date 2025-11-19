@@ -78,7 +78,6 @@ export default function Home() {
 
   return (
     <>
-      <Toaster position="top-right" />
       <div className="min-h-screen bg-gray-100">
         {/* Top Navbar */}
         <header className="bg-white shadow px-6 py-4 flex items-center justify-between sticky top-0 z-20">
