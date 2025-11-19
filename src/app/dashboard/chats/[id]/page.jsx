@@ -104,7 +104,7 @@ function page({ params }) {
 
 
 
-    socket.on("file-transfer", (roomId) => {
+    socket.on("file-transfer-start", (roomId) => {
       if(upload) return
       setUpload(true)
       setRoomId(roomId)

@@ -3,8 +3,6 @@ import { useSocketStore } from '@/lib/socketStore';
 import { FileIcon, X } from 'lucide-react';
 import React, { useEffect, useState, useRef } from 'react';
 
-// Removed unused and non-browser imports.
-
 interface FileUploadProps {
   onClose: () => void;
 }
@@ -21,110 +19,102 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   const socket = useSocketStore((state) => state.socket);
 
   const [files, setFiles] = useState<ReceivedFile[]>([]);
-  const [progress, setProgress] = useState<number>(0)
-  // Using useRef to store the binary chunks Map, which prevents unnecessary re-renders.
   const fileChunksRef = useRef<Map<string, Uint8Array[]>>(new Map());
   const { roomId } = fileTransferStore();
-
-
-
 
   useEffect(() => {
     if (!socket) return;
 
-    const fileChunks = fileChunksRef.current; // Get the current map reference
+    const fileChunks = fileChunksRef.current;
 
+    // --- 1. FIXED: meta-transfer now expects single object ---
+    socket.on("meta-transfer", (data: any) => {
+      const { fileName, size, fileType } = data;
 
-    socket.on("meta-transfer", (data: any[]) => {
-      const fileData = data.map((f: any) => {
+      fileChunks.set(fileName, []);
 
-        fileChunks.set(f.file, []);
-        return {
-          file: f.file,
-          size: f.size,
-          fileType: f.fileType,
+      setFiles([
+        {
+          file: fileName,
+          size,
+          fileType,
           progress: 0,
-          receivedBytes: 0
-        };
-      });
-      setFiles(fileData);
+          receivedBytes: 0,
+        },
+      ]);
     });
 
-    socket.on("recieve-file-chunk", (data: any) => {
-      const { file, chunk } = data;
+    // --- 2. FIXED: corrected event spelling ---
+    socket.on("receive-file-chunk", (data: any) => {
+      const { fileName, chunk } = data;
       const arrChunk = new Uint8Array(chunk);
 
-      const chunks = fileChunks.get(file);
-      console.log("is chunks", fileChunks)
-      if (!chunks) return console.warn("Chunk received before metadata:", file);
+      const chunks = fileChunks.get(fileName);
+      if (!chunks) return;
 
       chunks.push(arrChunk);
 
-
-
-      setFiles(prev =>
-        prev.map(f =>
-          f.file === file
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.file === fileName
             ? {
-              ...f,
-              receivedBytes: f.receivedBytes + arrChunk.byteLength,
-              progress: Math.round(((f.receivedBytes + arrChunk.byteLength) / f.size) * 100),
-            }
+                ...f,
+                receivedBytes: f.receivedBytes + arrChunk.byteLength,
+                progress: Math.round(
+                  ((f.receivedBytes + arrChunk.byteLength) / f.size) * 100
+                ),
+              }
             : f
         )
       );
     });
 
-   
-
+    // --- 3. FILE END ---
     socket.on("file-transfer-end", (data: any) => {
+      const { fileName, fileType } = data;
 
-      const { file, fileType } = data;
-      const chunks = fileChunks.get(file);
-
+      const chunks = fileChunks.get(fileName);
+      if (!chunks) return;
 
       const blob = new Blob(chunks as BlobPart[], { type: fileType || "application/octet-stream" });
+
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = file;
+      a.download = fileName;
       a.click();
 
       URL.revokeObjectURL(a.href);
-      fileChunks.delete(file);
 
-      setFiles(prev => prev.filter(f => f.file !== file));
+      fileChunks.delete(fileName);
+
+      setFiles((prev) => prev.filter((f) => f.file !== fileName));
     });
 
-     socket.on("close-file-transfer", () => {
-      console.log("got a req to close on reciver")
-      onClose()
-    })
+    // --- 4. CLOSE TRANSFER ---
+    socket.on("close-file-transfer", () => {
+      onClose();
+    });
 
-    // Cleanup function to remove event listeners on component unmount
     return () => {
       socket.off("meta-transfer");
-      socket.off("recieve-file-chunk");
+      socket.off("receive-file-chunk");
       socket.off("file-transfer-end");
-       socket.off("close-file-transfer");
+      socket.off("close-file-transfer");
     };
-  }, [socket]); // Depend on socket to re-run effect if it changes
+  }, [socket]);
 
-  // Helper function to format bytes to MB
-  const formatFileSize = (size: number) => {
-    const mb = size / 1_000_000;
-    return `${mb.toFixed(2)} MB`;
-  };
+  // Format size helper
+  const formatSize = (size: number) => (size / 1_000_000).toFixed(2) + " MB";
 
   const handleClose = () => {
-    if (!socket) return
-    socket.emit("close-file-transfer", { roomId })
-    onClose()
-  }
+    if (!socket) return;
+    socket.emit("close-file-transfer", { roomId });
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white relative w-full max-w-4xl rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col md:flex-row gap-8">
-        {/* Close button */}
         <button
           onClick={handleClose}
           className="absolute cursor-pointer top-[-50px] right-[-10px] md:top-[-30px] md:right-[-30px] text-white border border-white rounded transition-all hover:rounded-[50%] duration-300 p-1"
@@ -145,12 +135,12 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
           <div className="space-y-4">
             {files.map((file, index) => (
               <div key={index} className="flex flex-col gap-1 p-3 border-b">
-                <div className="flex items-center gap-3 overflow-hidden">
+                <div className="flex items-center gap-3 truncate">
                   <FileIcon className="text-blue-500 w-8 h-8" />
                   <div className="truncate">
                     <p className="font-medium truncate">{file.file}</p>
                     <p className="text-sm text-gray-500">
-                      {formatFileSize(file.size)}
+                      {formatSize(file.size)}
                     </p>
                   </div>
                 </div>
@@ -160,8 +150,9 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
                   <div
                     className="h-full bg-green-500 rounded"
                     style={{ width: `${file.progress}%` }}
-                  />
+                  ></div>
                 </div>
+
                 <p className="text-xs text-gray-600">{file.progress}%</p>
               </div>
             ))}
