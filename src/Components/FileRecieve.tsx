@@ -30,7 +30,7 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
     // --- 1. FIXED: meta-transfer now expects single object ---
     socket.on("meta-transfer", (data: any) => {
       const { fileName, size, fileType } = data;
-      console.log("got meta data")
+      console.log("got meta data",fileName, size, fileType)
 
       fileChunks.set(fileName, []);
 
@@ -88,7 +88,7 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
 
       fileChunks.delete(fileName);
 
-      setFiles((prev) => prev.filter((f) => f.file !== fileName));
+      // setFiles((prev) => prev.filter((f) => f.file !== fileName));
     });
 
     // --- 4. CLOSE TRANSFER ---
@@ -103,6 +103,10 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
       socket.off("close-file-transfer");
     };
   }, [socket]);
+
+  useEffect(()=>{
+    console.log(files)
+  },[files])
 
   // Format size helper
   const formatSize = (size: number) => (size / 1_000_000).toFixed(2) + " MB";
@@ -134,7 +138,7 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
           </div>
 
           <div className="space-y-4">
-            {files.map((file, index) => (
+            {files && files.map((file, index) => (
               <div key={index} className="flex flex-col gap-1 p-3 border-b">
                 <div className="flex items-center gap-3 truncate">
                   <FileIcon className="text-blue-500 w-8 h-8" />

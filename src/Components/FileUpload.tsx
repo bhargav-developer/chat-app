@@ -48,22 +48,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
 
     const { file, id } = uploadStatus;
 
-
-
-    // --- Request room from server ---
-    socket.emit('sender-file-transfer-req', {
-      senderId: socket.id,
-      receiverId,
-      name: file.name,
-    });
-
-
-    const roomId: string = await new Promise((resolve) => {
-      socket.once('file-transfer-start', (data: any) => resolve(data.roomId));
-    });
-
-    updateFileStatus(id, { status: 'uploading', roomId });
-
     // --- Send file metadata ---
     socket.emit('file-meta', {
       fileName: file.name,
