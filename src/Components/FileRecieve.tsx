@@ -30,6 +30,7 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
     // --- 1. FIXED: meta-transfer now expects single object ---
     socket.on("meta-transfer", (data: any) => {
       const { fileName, size, fileType } = data;
+      console.log("got meta data")
 
       fileChunks.set(fileName, []);
 

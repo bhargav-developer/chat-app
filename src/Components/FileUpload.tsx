@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { FileIcon, UploadIcon, TrashIcon, X } from 'lucide-react';
 import { useSocketStore } from '@/lib/socketStore';
 import { fileTransferStore } from '@/lib/fileTransferStore';
@@ -22,6 +22,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
   const [files, setFiles] = useState<FileUploadStatus[]>([]);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
   const socket = useSocketStore((state) => state.socket);
+  const { roomId } = fileTransferStore();
+
+  useEffect(() => {
+    if (!socket) return
+    socket.on("close-file-transfer", () => {
+      onClose()
+    })
+  }, [socket])
 
   const updateFileStatus = useCallback(
     (id: string, updates: Partial<FileUploadStatus>) => {
@@ -40,6 +48,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
 
     const { file, id } = uploadStatus;
 
+
+
     // --- Request room from server ---
     socket.emit('sender-file-transfer-req', {
       senderId: socket.id,
@@ -47,9 +57,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
       name: file.name,
     });
 
-    socket.on("file-transfer-start",()=>{
-      console.log("req for upload accepted")
-    })
 
     const roomId: string = await new Promise((resolve) => {
       socket.once('file-transfer-start', (data: any) => resolve(data.roomId));
@@ -124,8 +131,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
     setFiles((prev) => prev.filter((f) => f.id !== id));
 
   const handleClose = () => {
+    console.log(roomId)
     if (socket) {
-      files.forEach((f) => f.roomId && socket.emit('close-file-transfer', { roomId: f.roomId }));
+      socket.emit("close-file-transfer", { roomId })
     }
     onClose();
   };
