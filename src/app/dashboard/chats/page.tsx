@@ -148,7 +148,6 @@ const Page = () => {
   return (
     <>
       <div className='border-b border-gray-100'>
-      <Toaster position='top-right' ></Toaster>
         <div className='px-2 mb-4 m-2'>
           <div className='flex justify-between'>
             <h1 className='font-bold text-xl p-3'>Chat List</h1>

@@ -55,7 +55,6 @@ const Page = () => {
 
   return (
     <>
-      <Toaster position="bottom-right" />
       <div className="min-h-screen flex items-center justify-center bg-[#f0f4ff] px-4">
         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
           {/* Header */}

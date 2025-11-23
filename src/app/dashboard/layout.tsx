@@ -32,9 +32,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     getUserInfo();
   }, []);
 
-  useEffect(() => {
-    console.log(roomId)
-  }, [roomId]);
 
   useEffect(() => {
     if (!socket) return;

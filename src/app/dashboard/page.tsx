@@ -155,7 +155,7 @@ export default function Home() {
                     <Avatar avatarUrl={chat.avatar} isOnline={statusMap.get(chat.userId)?.online} />
                     <div>
                       <p className="font-medium text-gray-800">{chat.firstName}</p>
-                      <p className="text-sm text-gray-500 truncate max-w-[200px] ">{chat.lastMessage}</p>
+                      <p className="text-sm text-gray-500 truncate max-w-[200px] md:max-w-[400px] ">{chat.lastMessage}</p>
                     </div>
                   </div>
                   <div className="text-right text-sm text-gray-400 flex-shrink-0 flex items-center gap-2">

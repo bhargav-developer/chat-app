@@ -71,7 +71,6 @@ const Page = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
-            <Toaster position="bottom-right" />
       <div className="flex max-w-5xl w-full backdrop-blur-md bg-white/30 border border-white/20 rounded-2xl overflow-hidden shadow-xl">
         {/* Left Image Section */}
         <div className="w-1/2 hidden md:block relative">

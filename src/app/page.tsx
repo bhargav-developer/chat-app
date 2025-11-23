@@ -1,7 +1,8 @@
 "use client"
-import React from 'react';
+import React, { useEffect } from 'react';
 import { MessageSquare, Upload, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 const App = () => {
   const router = useRouter()
@@ -16,6 +17,22 @@ const App = () => {
     { q: 'Can I send large files?', a: 'Yes! Up to 5GB per file on our free plan.' },
     { q: 'Is my data secure?', a: 'Absolutely — we use modern encryption protocols end-to-end.' }
   ];
+
+  useEffect(()=>{
+ 
+  },[])
+
+  const checkExistingUser = async () => {
+       try{
+      const res = await axios.get("/api/auth/me", { withCredentials: true });
+        if(res.data && res.status === 200){
+          router.push("/dashboard")
+        }
+
+    }catch(err){
+      console.log(err)
+    }
+  }
 
   return (
     <div className="font-inter text-gray-800 bg-gray-50">
