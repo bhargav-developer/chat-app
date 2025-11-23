@@ -18,18 +18,18 @@ const App = () => {
     { q: 'Is my data secure?', a: 'Absolutely — we use modern encryption protocols end-to-end.' }
   ];
 
-  useEffect(()=>{
- 
-  },[])
+  useEffect(() => {
+    checkExistingUser()
+  }, [])
 
   const checkExistingUser = async () => {
-       try{
+    try {
       const res = await axios.get("/api/auth/me", { withCredentials: true });
-        if(res.data && res.status === 200){
-          router.push("/dashboard")
-        }
+      if (res.data && res.status === 200) {
+        router.push("/dashboard")
+      }
 
-    }catch(err){
+    } catch (err) {
       console.log(err)
     }
   }

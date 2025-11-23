@@ -150,7 +150,7 @@ export default function Home() {
 
             <div className="space-y-4">
               {recentChats && recentChats.map((chat, index) => (
-                <div onClick={() => router.push(`/dashboard/chats/${chat.userId}`)} key={index} className="flex items-center justify-between hover:bg-gray-50 p-2 rounded-md transition">
+                <div onClick={() => router.push(`/dashboard/chats/${chat.userId}`)} key={index} className="flex items-center justify-between hover:bg-gray-50 p-2 cursor-pointer rounded-md transition">
                   <div className="flex items-center gap-4">
                     <Avatar avatarUrl={chat.avatar} isOnline={statusMap.get(chat.userId)?.online} />
                     <div>
