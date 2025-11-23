@@ -85,7 +85,7 @@ export default function Home() {
             {user?.name &&
               <SplitText
                 text={`Hello, ${user?.name}`}
-                className="text-4xl p-1 font-semibold text-center"
+                className="md:text-4xl text-xl font-semibold text-center"
 
                 delay={100}
 
@@ -145,7 +145,7 @@ export default function Home() {
           <section className="bg-white shadow rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">Recent Chats</h2>
-              <button className="text-sm text-indigo-600 hover:underline">View all</button>
+              {/* <button className="text-sm text-indigo-600 hover:underline">View all</button> */}
             </div>
 
             <div className="space-y-4">
