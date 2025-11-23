@@ -85,7 +85,7 @@ export default function Home() {
             {user?.name &&
               <SplitText
                 text={`Hello, ${user?.name}`}
-                className="md:text-4xl text-xl font-semibold text-center"
+                className="md:text-4xl text-xl p-1 font-semibold text-center"
 
                 delay={100}
 
@@ -142,7 +142,7 @@ export default function Home() {
           </div> */}
 
           {/* Recent Chats */}
-          <section className="bg-white shadow rounded-lg p-6">
+          <section className="bg-white shadow  rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">Recent Chats</h2>
               {/* <button className="text-sm text-indigo-600 hover:underline">View all</button> */}
@@ -155,7 +155,7 @@ export default function Home() {
                     <Avatar avatarUrl={chat.avatar} isOnline={statusMap.get(chat.userId)?.online} />
                     <div>
                       <p className="font-medium text-gray-800">{chat.firstName}</p>
-                      <p className="text-sm text-gray-500 truncate max-w-xs">{chat.lastMessage}</p>
+                      <p className="text-sm text-gray-500 truncate max-w-[200px] ">{chat.lastMessage}</p>
                     </div>
                   </div>
                   <div className="text-right text-sm text-gray-400 flex-shrink-0 flex items-center gap-2">
