@@ -3,7 +3,7 @@ import { FileIcon, UploadIcon, TrashIcon, X } from 'lucide-react';
 import { useSocketStore } from '@/lib/socketStore';
 import { fileTransferStore } from '@/lib/fileTransferStore';
 
-const CHUNK_SIZE = 1024 * 64;
+const CHUNK_SIZE = 1024 * 1024;   // 1 MB
 
 interface FileUploadProps {
   onClose: () => void;
