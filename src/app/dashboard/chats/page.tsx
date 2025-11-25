@@ -178,7 +178,7 @@ const Page = () => {
             <h1 className="font-bold w-full">
               {chat.firstName} {chat.userId === user?.id && "(you)"}
             </h1>
-            <p className="text-gray-500 text-sm w-full truncate">
+            <p className="text-gray-500 truncate max-w-[200px] md:max-w-[400px] text-sm w-full truncate">
               {chat.lastMessage}
             </p>
           </div>

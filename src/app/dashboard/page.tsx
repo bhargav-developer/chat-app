@@ -15,6 +15,7 @@ import axios from "axios";
 import { logout } from "../apiEndPoints/auth";
 import Avatar from "@/Components/Avatar";
 import { useUsersStore } from "@/lib/usersStore";
+import { useSocketStore } from "@/lib/socketStore";
 
 
 
@@ -33,11 +34,14 @@ export default function Home() {
   const router = useRouter();
   const [recentChats, setRecentChats] = useState<Chats[]>([]);
   const socketUrl = process.env.NEXT_PUBLIC_SOCKET;
+  const {socket} = useSocketStore();
   const { statusMap, setStatus } = useUsersStore();
 
 
   useEffect(() => {
-    findRecentChats()
+    if(user && user.id){
+      findRecentChats()
+    }
   }, [user])
 
   const handleLogout = async () => {
