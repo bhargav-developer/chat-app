@@ -21,96 +21,69 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   const [files, setFiles] = useState<ReceivedFile[]>([]);
   const fileChunksRef = useRef<Map<string, Uint8Array[]>>(new Map());
   const { roomId } = fileTransferStore();
+ useEffect(() => {
+  if (!socket) return;
 
-  useEffect(() => {
-    console.log(files)
-  }, [files])
+  const fileChunks = new Map<string, Uint8Array[]>();
+  const fileInfo = new Map<string, { size: number; type: string; roomId: string }>();
 
-  useEffect(() => {
-    if (!socket) return;
+  // --- Receive metadata ---
+  socket.on("meta-transfer", ({ fileName, size, fileType, roomId }) => {
+    fileChunks.set(fileName, []);
+    fileInfo.set(fileName, { size, type: fileType, roomId });
 
-    const fileChunks = fileChunksRef.current;
+    setFiles(prev => [...prev, {
+      file: fileName,
+      size,
+      fileType,
+      progress: 0,
+      receivedBytes: 0,
+    }]);
+  });
 
-    // --- 1. FIXED: meta-transfer now expects single object ---
-    socket.on("meta-transfer", (data: any) => {
-      const { fileName, size, fileType } = data;
-      console.log("got meta data", fileName, size, fileType)
-
-      fileChunks.set(fileName, []);
-
-      setFiles((prev) => [...prev,
-      {
-        file: fileName,
-        size,
-        fileType,
-        progress: 0,
-        receivedBytes: 0,
-      },
-      ]);
-    });
-
-    // --- 2. FIXED: corrected event spelling ---
-  socket.on("receive-file-chunk", (data: any) => {
-  const { fileName, chunk } = data;
-  const arrChunk = new Uint8Array(chunk);
-
-  const chunks = fileChunks.get(fileName);
-  if (!chunks) return;
-
-  chunks.push(arrChunk);
-
-  // UPDATE PROGRESS UI
-  setFiles(prev =>
-    prev.map(f =>
+  // --- Receive chunks ---
+  socket.on("receive-file-chunk", ({ fileName, chunk }) => {
+    const arr = new Uint8Array(chunk);
+    fileChunks.get(fileName)?.push(arr);
+    setFiles(prev => prev.map(f =>
       f.file === fileName
         ? {
             ...f,
-            receivedBytes: f.receivedBytes + arrChunk.byteLength,
+            receivedBytes: f.receivedBytes + arr.length,
             progress: Math.round(
-              ((f.receivedBytes + arrChunk.byteLength) / f.size) * 100
+              ((f.receivedBytes + arr.length) / f.size) * 100
             ),
           }
         : f
-    )
-  );
+    ));
+  });
 
-  socket.emit("chunk-ack", { fileName,roomId }); // 👈 SEND ACK
-});
+  // --- File done ---
+  socket.on("file-transfer-end", ({ fileName }) => {
+    const chunks = fileChunks.get(fileName);
+    const info = fileInfo.get(fileName);
+    if (!chunks || !info) return;
 
+    const blob = new Blob(chunks as BlobPart[], { type: info.type });
+    const url = URL.createObjectURL(blob);
 
-    // --- 3. FILE END ---
-    socket.on("file-transfer-end", (data: any) => {
-      const { fileName, fileType } = data;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.click();
 
-      const chunks = fileChunks.get(fileName);
-      if (!chunks) return;
+    URL.revokeObjectURL(url);
+    fileChunks.delete(fileName);
+    fileInfo.delete(fileName);
+  });
 
-      const blob = new Blob(chunks as BlobPart[], { type: fileType || "application/octet-stream" });
+  return () => {
+    socket.off("meta-transfer");
+    socket.off("receive-file-chunk");
+    socket.off("file-transfer-end");
+  };
+}, [socket]);
 
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = fileName;
-      a.click();
-
-      URL.revokeObjectURL(a.href);
-
-      fileChunks.delete(fileName);
-
-      // setFiles((prev) => prev.filter((f) => f.file !== fileName));
-    });
-
-    // --- 4. CLOSE TRANSFER ---
-    socket.on("close-file-transfer", () => {
-      onClose();
-    });
-
-    return () => {
-      socket.off("meta-transfer");
-      socket.off("receive-file-chunk");
-      socket.off("file-transfer-end");
-      socket.off("close-file-transfer");
-    };
-  }, [socket]);
 
   useEffect(() => {
     console.log(files)

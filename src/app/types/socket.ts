@@ -6,7 +6,7 @@ export interface ServerToClientEvents {
     timestamp: string;
   }) => void;
   'meta-transfer': (data: any) => void;
-  "receive-file-chunk": (data: {}) => void;
+  "receive-file-chunk": (data: any) => void;
   "update_users": (data: Object) => void;
   "receiver-file-transfer-request": (data: any) => void;
   "file-transfer-end": (data: any) => void;
