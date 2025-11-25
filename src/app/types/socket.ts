@@ -12,7 +12,8 @@ export interface ServerToClientEvents {
   "file-transfer-end": (data: any) => void;
   "rejected-file-transfer": (data: any) => void;
   "close-file-transfer": (data: any) => void;
-  "file-transfer-start": (data: any) => void
+  "file-transfer-start": (data: any) => void;
+  "chunk-ack": (data: any) => void;
 }
 
 export interface ClientToServerEvents {
@@ -28,5 +29,6 @@ export interface ClientToServerEvents {
   "reject-file-transfer": (data: any) => void;
   "close-file-transfer": (data: any) => void;
   'join': (userId: string) => void;
-    "sender-file-transfer-req": (data: any) => void
+  "sender-file-transfer-req": (data: any) => void
+  "chunk-ack": (data: any) => void;
 }

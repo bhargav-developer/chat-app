@@ -40,57 +40,72 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
     []
   );
 
-  const startFileUpload = async (uploadStatus: FileUploadStatus) => {
-    if (!socket) {
-      updateFileStatus(uploadStatus.id, { status: 'failed' });
-      return;
+const startFileUpload = async (uploadStatus: FileUploadStatus) => {
+  if (!socket) {
+    updateFileStatus(uploadStatus.id, { status: 'failed' });
+    return;
+  }
+
+  const { file, id } = uploadStatus;
+
+  socket.emit('file-meta', {
+    fileName: file.name,
+    size: file.size,
+    fileType: file.type,
+    roomId,
+  });
+
+  let offset = 0;
+  let waitingForAck = false;
+
+  socket.on("chunk-ack", () => {
+    waitingForAck = false;
+  });
+
+  while (offset < file.size) {
+    // Wait for receiver ACK before sending next chunk
+    if (waitingForAck) {
+      await new Promise(res => setTimeout(res, 1));
+      continue;
     }
 
-    const { file, id } = uploadStatus;
+    const slice = file.slice(offset, offset + CHUNK_SIZE);
+    const reader = new FileReader();
 
-    // --- Send file metadata ---
-    socket.emit('file-meta', {
-      fileName: file.name,
-      size: file.size,
-      fileType: file.type,
-      roomId,
+    waitingForAck = true; // we will wait for ack
+
+    await new Promise<void>((resolve) => {
+      reader.onload = () => {
+        const buffer = new Uint8Array(reader.result as ArrayBuffer);
+
+        socket.emit('send-file-chunk', {
+          fileName: file.name,
+          buffer,
+          roomId,
+        });
+
+        offset += buffer.byteLength;
+
+        updateFileStatus(id, {
+          progress: Math.min(100, Math.round((offset / file.size) * 100)),
+          status: 'uploading'
+        });
+
+        resolve();
+      };
+
+      reader.onerror = () => {
+        updateFileStatus(id, { status: 'failed' });
+        resolve();
+      };
+
+      reader.readAsArrayBuffer(slice);
     });
+  }
 
-    // --- Send file chunks ---
-    let offset = 0;
-    while (offset < file.size) {
-      const slice = file.slice(offset, offset + CHUNK_SIZE);
-      const reader = new FileReader();
-
-      await new Promise<void>((resolve) => {
-        reader.onload = () => {
-          const buffer = new Uint8Array(reader.result as ArrayBuffer);
-          socket.emit('send-file-chunk', {
-            buffer,
-            fileName: file.name,
-            roomId,
-          });
-          offset += buffer.byteLength;
-          const progress = Math.min(100, Math.round((offset / file.size) * 100));
-          updateFileStatus(id, { progress });
-          resolve();
-        };
-        reader.onerror = () => {
-          updateFileStatus(id, { status: 'failed' });
-          resolve();
-        };
-        reader.readAsArrayBuffer(slice);
-      });
-    }
-
-    // --- End transfer ---
-    socket.emit('file-end', {
-      fileName: file.name,
-      fileType: file.type,
-      roomId,
-    });
-    updateFileStatus(id, { status: 'completed' });
-  };
+  socket.emit('file-end', { fileName: file.name, fileType: file.type, roomId });
+  updateFileStatus(id, { status: 'completed' });
+};
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);

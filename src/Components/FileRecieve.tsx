@@ -50,29 +50,33 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
     });
 
     // --- 2. FIXED: corrected event spelling ---
-    socket.on("receive-file-chunk", (data: any) => {
-      const { fileName, chunk } = data;
-      const arrChunk = new Uint8Array(chunk);
+  socket.on("receive-file-chunk", (data: any) => {
+  const { fileName, chunk } = data;
+  const arrChunk = new Uint8Array(chunk);
 
-      const chunks = fileChunks.get(fileName);
-      if (!chunks) return;
+  const chunks = fileChunks.get(fileName);
+  if (!chunks) return;
 
-      chunks.push(arrChunk);
+  chunks.push(arrChunk);
 
-      setFiles((prev) =>
-        prev.map((f) =>
-          f.file === fileName
-            ? {
-              ...f,
-              receivedBytes: f.receivedBytes + arrChunk.byteLength,
-              progress: Math.round(
-                ((f.receivedBytes + arrChunk.byteLength) / f.size) * 100
-              ),
-            }
-            : f
-        )
-      );
-    });
+  // UPDATE PROGRESS UI
+  setFiles(prev =>
+    prev.map(f =>
+      f.file === fileName
+        ? {
+            ...f,
+            receivedBytes: f.receivedBytes + arrChunk.byteLength,
+            progress: Math.round(
+              ((f.receivedBytes + arrChunk.byteLength) / f.size) * 100
+            ),
+          }
+        : f
+    )
+  );
+
+  socket.emit("chunk-ack", { fileName,roomId }); // 👈 SEND ACK
+});
+
 
     // --- 3. FILE END ---
     socket.on("file-transfer-end", (data: any) => {
