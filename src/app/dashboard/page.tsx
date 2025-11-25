@@ -44,6 +44,13 @@ export default function Home() {
     }
   }, [user])
 
+
+  useEffect(() => {
+  if(!socket) return
+  socket.on("receive-message",()=>{
+      findRecentChats()
+  })
+  }, [socket])
   const handleLogout = async () => {
     try {
       const req = await logout();
@@ -53,21 +60,19 @@ export default function Home() {
     }
     catch (error: Error | any) {
       const errorMessage = error.message ? error.message : "an error occcured"
-      toast.error("an err occured")
+      toast.error(errorMessage)
     }
   }
 
   const findRecentChats = async () => {
     try {
       const userId = user?.id
-      console.log("user id ",userId)
       const res = await axios.get(`${socketUrl}/messages/chats`, {
         params: {
           userId
         }
       })
       const data = await res.data;
-      console.log(data)
       if (data) {
         setRecentChats(data);
       }

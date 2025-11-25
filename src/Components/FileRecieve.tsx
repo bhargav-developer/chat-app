@@ -23,6 +23,10 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   const { roomId } = fileTransferStore();
 
   useEffect(() => {
+    console.log(files)
+  }, [files])
+
+  useEffect(() => {
     if (!socket) return;
 
     const fileChunks = fileChunksRef.current;
@@ -30,18 +34,18 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
     // --- 1. FIXED: meta-transfer now expects single object ---
     socket.on("meta-transfer", (data: any) => {
       const { fileName, size, fileType } = data;
-      console.log("got meta data",fileName, size, fileType)
+      console.log("got meta data", fileName, size, fileType)
 
       fileChunks.set(fileName, []);
 
-      setFiles([
-        {
-          file: fileName,
-          size,
-          fileType,
-          progress: 0,
-          receivedBytes: 0,
-        },
+      setFiles((prev) => [...prev,
+      {
+        file: fileName,
+        size,
+        fileType,
+        progress: 0,
+        receivedBytes: 0,
+      },
       ]);
     });
 
@@ -59,12 +63,12 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
         prev.map((f) =>
           f.file === fileName
             ? {
-                ...f,
-                receivedBytes: f.receivedBytes + arrChunk.byteLength,
-                progress: Math.round(
-                  ((f.receivedBytes + arrChunk.byteLength) / f.size) * 100
-                ),
-              }
+              ...f,
+              receivedBytes: f.receivedBytes + arrChunk.byteLength,
+              progress: Math.round(
+                ((f.receivedBytes + arrChunk.byteLength) / f.size) * 100
+              ),
+            }
             : f
         )
       );
@@ -104,9 +108,9 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
     };
   }, [socket]);
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(files)
-  },[files])
+  }, [files])
 
   // Format size helper
   const formatSize = (size: number) => (size / 1_000_000).toFixed(2) + " MB";
@@ -127,7 +131,7 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex-1 overflow-auto max-h-[400px]">
+        <div className="flex-1 overflow-auto max-h-[300px]">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-lg md:text-xl">Received Files</h2>
             {files.length > 0 && (

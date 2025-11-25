@@ -134,13 +134,13 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
 
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white relative w-full max-w-4xl rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col md:flex-row gap-8">
+      <div className="bg-white relative w-full max-w-4xl rounded-3xl shadow-2xl p-6 md:p-8 flex flex-col md:flex-row gap-8">
         <button onClick={handleClose} aria-label="Close upload window" className="absolute top-[-50px] right-[-10px] md:top-[-30px] md:right-[-30px] text-white border border-white rounded p-1">
           <X className="w-5 h-5" />
         </button>
 
         {/* Upload Area */}
-        <div className="flex-1 border-2 border-dashed border-indigo-500 rounded-xl flex flex-col items-center justify-center gap-4 p-6">
+        <div className="flex-1 border-2 border-dashed border-indigo-500 rounded-xl flex flex-col items-center justify-center gap-4 p-4 md:p-6">
           <UploadIcon className="text-indigo-500 w-10 h-10" />
           <p className="text-center text-gray-700 font-medium">
             Drag and drop files to upload <br className="hidden md:block" /> or
@@ -150,7 +150,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
         </div>
 
         {/* Upload Status */}
-        <div className="flex-1 overflow-auto max-h-[400px]">
+        <div className="flex-1 overflow-auto max-h-[200px]">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-lg md:text-xl">Upload Status</h2>
             {files.length > 0 && <span className="bg-indigo-600 text-white w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold">{files.length}</span>}
