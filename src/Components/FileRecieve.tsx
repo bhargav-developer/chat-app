@@ -56,6 +56,8 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
           }
           : f
       ));
+
+      socket.emit("chunk-ack",{roomId})
     });
 
     // --- File done ---

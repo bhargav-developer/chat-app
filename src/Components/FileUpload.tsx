@@ -40,53 +40,68 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
     []
   );
 
-const startFileUpload = async (uploadStatus: FileUploadStatus) => {
-  if (!socket) return;
+  const startFileUpload = async (uploadStatus: FileUploadStatus) => {
+    if (!socket) return;
 
-  const { file, id } = uploadStatus;
+    const { file, id } = uploadStatus;
 
-  // Send metadata
-  socket.emit("file-meta", {
-    roomId,
-    fileName: file.name,
-    fileType: file.type,
-    size: file.size,
-  });
-
-  const stream = file.stream().getReader();   // FAST STREAM READER
-  let sentBytes = 0;
-  let seq = 0;
-
-  updateFileStatus(id, { status: "uploading" });
-
-  while (true) {
-    const { done, value } = await stream.read();
-    if (done) break;
-
-    // value = Uint8Array chunk (256KB–1MB depending on browser)
-    socket.emit("send-file-chunk", {
+    // Send metadata
+    socket.emit("file-meta", {
       roomId,
       fileName: file.name,
-      seq,
-      buffer: value,
+      fileType: file.type,
+      size: file.size,
     });
 
-    sentBytes += value.length;
-    seq++;
+    const stream = file.stream().getReader();   // FAST STREAM READER
+    let sentBytes = 0;
+    let seq = 0;
 
-    updateFileStatus(id, {
-      progress: Math.round((sentBytes / file.size) * 100),
+    updateFileStatus(id, { status: "uploading" });
+
+
+    let sendChunk = true;
+
+    while (true) {
+      const { done, value } = await stream.read();
+      if (done) break;
+
+
+
+      const waitforChunk = () => new Promise(res => {
+        socket.on("chunk-ack", (data) => {
+          res(data)
+          sendChunk = true
+        })
+      })
+      if (sendChunk) {
+
+        socket.emit("send-file-chunk", {
+          roomId,
+          fileName: file.name,
+          seq,
+          buffer: value,
+        });
+      }
+      sentBytes += value.length;
+      seq++;
+
+      updateFileStatus(id, {
+        progress: Math.round((sentBytes / file.size) * 100),
+      });
+
+      sendChunk = false;
+      await waitforChunk();
+    }
+
+    socket.emit("file-end", {
+      roomId,
+      fileName: file.name,
+      fileType: file.type,
     });
-  }
 
-  socket.emit("file-end", {
-    roomId,
-    fileName: file.name,
-    fileType: file.type,
-  });
-
-  updateFileStatus(id, { status: "completed" });
-};
+    updateFileStatus(id, { status: "completed" });
+  };
 
 
 
