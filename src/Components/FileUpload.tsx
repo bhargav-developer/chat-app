@@ -62,37 +62,33 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
 
     let sendChunk = true;
 
-    while (true) {
-      const { done, value } = await stream.read();
-      if (done) break;
-
-
-
-      const waitforChunk = () => new Promise(res => {
-        socket.on("chunk-ack", (data) => {
-          res(data)
-          sendChunk = true
-        })
-      })
-      if (sendChunk) {
-
-        socket.emit("send-file-chunk", {
-          roomId,
-          fileName: file.name,
-          seq,
-          buffer: value,
-        });
-      }
-      sentBytes += value.length;
-      seq++;
-
-      updateFileStatus(id, {
-        progress: Math.round((sentBytes / file.size) * 100),
+    const waitForChunkAck = () => {
+      return new Promise((resolve) => {
+        socket.once("chunk-ack", (data) => resolve(data));
       });
+    };
 
-      sendChunk = false;
-      await waitforChunk();
-    }
+while (true) {
+  const { done, value } = await stream.read();
+  if (done) break;
+
+  socket.emit("send-file-chunk", {
+    roomId,
+    fileName: file.name,
+    seq,
+    buffer: value,
+  });
+
+  sentBytes += value.length;
+  seq++;
+
+  updateFileStatus(id, {
+    progress: Math.round((sentBytes / file.size) * 100),
+  });
+
+  await waitForChunkAck();  // Wait until event
+}
+
 
     socket.emit("file-end", {
       roomId,
