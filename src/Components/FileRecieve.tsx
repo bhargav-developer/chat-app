@@ -45,7 +45,13 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
     socket.on("receive-file-chunk", ({ fileName, chunk }) => {
       const arr = new Uint8Array(chunk);
       fileChunks.get(fileName)?.push(arr);
-      socket.emit("chunk-ack",{roomId})
+      let ackCounter = 0;
+
+      if (++ackCounter % 8 === 0) {
+        socket.emit("chunk-ack", { roomId });
+      }
+
+
       setFiles(prev => prev.map(f =>
         f.file === fileName
           ? {
