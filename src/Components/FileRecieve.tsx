@@ -80,10 +80,7 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
 
     socket.on("close-file-transfer", () => {
       if (!socket) return
-      socket.on("close-file-transfer", () => {
-        onClose()
-        console.log("got close req")
-      })
+      onClose()
     })
 
     return () => {
