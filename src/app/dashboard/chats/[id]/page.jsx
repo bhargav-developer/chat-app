@@ -12,6 +12,7 @@ import axios from 'axios'
 import { ArrowLeftCircleIcon, DeleteIcon, Link2Icon, SendHorizontalIcon, SmileIcon, Trash2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
+import toast from 'react-hot-toast'
 
 function page({ params }) {
   const { id } = React.use(params)
@@ -139,7 +140,7 @@ function page({ params }) {
         receiverId: User._id,
         name: user.name
       })
-      console.log(res)
+     toast.success(User ? `sent file request to ${User.firstName} ${User.lastName}`: "sent file request")
     } catch (err) {
       console.log(err)
     }
@@ -283,7 +284,6 @@ return (
       ))}
       <div ref={messagesEndRef} />
     </div>
-
     {/* Input */}
     <div className="border-transparent bg-white p-2 sm:p-3 gap-2 flex items-center w-full">
       <button type="button" className="cursor-pointer p-2" onClick={handleFileSender}>

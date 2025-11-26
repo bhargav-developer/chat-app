@@ -21,73 +21,79 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   const [files, setFiles] = useState<ReceivedFile[]>([]);
   const fileChunksRef = useRef<Map<string, Uint8Array[]>>(new Map());
   const { roomId } = fileTransferStore();
- useEffect(() => {
-  if (!socket) return;
+  useEffect(() => {
+    if (!socket) return;
 
-  const fileChunks = new Map<string, Uint8Array[]>();
-  const fileInfo = new Map<string, { size: number; type: string; roomId: string }>();
+    const fileChunks = new Map<string, Uint8Array[]>();
+    const fileInfo = new Map<string, { size: number; type: string; roomId: string }>();
 
-  // --- Receive metadata ---
-  socket.on("meta-transfer", ({ fileName, size, fileType, roomId }) => {
-    fileChunks.set(fileName, []);
-    fileInfo.set(fileName, { size, type: fileType, roomId });
+    // --- Receive metadata ---
+    socket.on("meta-transfer", ({ fileName, size, fileType, roomId }) => {
+      fileChunks.set(fileName, []);
+      fileInfo.set(fileName, { size, type: fileType, roomId });
 
-    setFiles(prev => [...prev, {
-      file: fileName,
-      size,
-      fileType,
-      progress: 0,
-      receivedBytes: 0,
-    }]);
-  });
+      setFiles(prev => [...prev, {
+        file: fileName,
+        size,
+        fileType,
+        progress: 0,
+        receivedBytes: 0,
+      }]);
+    });
 
-  // --- Receive chunks ---
-  socket.on("receive-file-chunk", ({ fileName, chunk }) => {
-    const arr = new Uint8Array(chunk);
-    fileChunks.get(fileName)?.push(arr);
-    setFiles(prev => prev.map(f =>
-      f.file === fileName
-        ? {
+    // --- Receive chunks ---
+    socket.on("receive-file-chunk", ({ fileName, chunk }) => {
+      const arr = new Uint8Array(chunk);
+      fileChunks.get(fileName)?.push(arr);
+      setFiles(prev => prev.map(f =>
+        f.file === fileName
+          ? {
             ...f,
             receivedBytes: f.receivedBytes + arr.length,
             progress: Math.round(
               ((f.receivedBytes + arr.length) / f.size) * 100
             ),
           }
-        : f
-    ));
-  });
+          : f
+      ));
+    });
 
-  // --- File done ---
-  socket.on("file-transfer-end", ({ fileName }) => {
-    const chunks = fileChunks.get(fileName);
-    const info = fileInfo.get(fileName);
-    if (!chunks || !info) return;
+    // --- File done ---
+    socket.on("file-transfer-end", ({ fileName }) => {
+      const chunks = fileChunks.get(fileName);
+      const info = fileInfo.get(fileName);
+      if (!chunks || !info) return;
 
-    const blob = new Blob(chunks as BlobPart[], { type: info.type });
-    const url = URL.createObjectURL(blob);
+      const blob = new Blob(chunks as BlobPart[], { type: info.type });
+      const url = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    a.click();
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
 
-    URL.revokeObjectURL(url);
-    fileChunks.delete(fileName);
-    fileInfo.delete(fileName);
-  });
-
-  return () => {
-    socket.off("meta-transfer");
-    socket.off("receive-file-chunk");
-    socket.off("file-transfer-end");
-  };
-}, [socket]);
+      URL.revokeObjectURL(url);
+      fileChunks.delete(fileName);
+      fileInfo.delete(fileName);
+    });
 
 
-  useEffect(() => {
-    console.log(files)
-  }, [files])
+    socket.on("close-file-transfer", () => {
+      if (!socket) return
+      socket.on("close-file-transfer", () => {
+        onClose()
+        console.log("got close req")
+      })
+    })
+
+    return () => {
+      socket.off("meta-transfer");
+      socket.off("receive-file-chunk");
+      socket.off("file-transfer-end");
+      socket.off("close-file-transfer")
+    };
+  }, [socket]);
+
 
   // Format size helper
   const formatSize = (size: number) => (size / 1_000_000).toFixed(2) + " MB";
@@ -101,10 +107,7 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white relative w-full max-w-4xl rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col md:flex-row gap-8">
-        <button
-          onClick={handleClose}
-          className="absolute cursor-pointer top-[-50px] right-[-10px] md:top-[-30px] md:right-[-30px] text-white border border-white rounded transition-all hover:rounded-[50%] duration-300 p-1"
-        >
+        <button onClick={handleClose} aria-label="Close upload window" className="absolute top-[-50px] right-[-10px] md:top-[-30px] md:right-[-30px] text-white border cursor-pointer border-white rounded p-1">
           <X className="w-5 h-5" />
         </button>
 

@@ -113,7 +113,6 @@ const startFileUpload = async (uploadStatus: FileUploadStatus) => {
     setFiles((prev) => prev.filter((f) => f.id !== id));
 
   const handleClose = () => {
-    console.log(roomId)
     if (socket) {
       socket.emit("close-file-transfer", { roomId })
     }
@@ -133,7 +132,7 @@ const startFileUpload = async (uploadStatus: FileUploadStatus) => {
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white relative w-full max-w-4xl rounded-3xl shadow-2xl p-6 md:p-8 flex flex-col md:flex-row gap-8">
-        <button onClick={handleClose} aria-label="Close upload window" className="absolute top-[-50px] right-[-10px] md:top-[-30px] md:right-[-30px] text-white border border-white rounded p-1">
+        <button onClick={handleClose} aria-label="Close upload window" className="absolute top-[-50px] right-[-10px] md:top-[-30px] md:right-[-30px] text-white border cursor-pointer border-white rounded p-1">
           <X className="w-5 h-5" />
         </button>
 
