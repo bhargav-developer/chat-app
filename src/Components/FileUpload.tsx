@@ -80,7 +80,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
         progress: Math.round((sentBytes / file.size) * 100),
       });
 
-      await waitForChunkAck();
+      if (seq % 16 === 0) await waitForChunkAck();
+
     }
 
     socket.emit("file-end", {

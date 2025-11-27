@@ -32,6 +32,8 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
       fileWriterRef.current = (window as any).__fileWriter ?? null;
     });
 
+    let ackCounter = 0;
+
     socket.on("receive-file-chunk", async ({ fileName, chunk }) => {
       const uint = new Uint8Array(chunk);
 
@@ -45,15 +47,16 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
         prev.map(f =>
           f.file === fileName
             ? {
-                ...f,
-                receivedBytes: f.receivedBytes + uint.length,
-                progress: Math.round(((f.receivedBytes + uint.length) / f.size) * 100)
-              }
+              ...f,
+              receivedBytes: f.receivedBytes + uint.length,
+              progress: Math.round(((f.receivedBytes + uint.length) / f.size) * 100)
+            }
             : f
         )
       );
+      ackCounter++;
+      if (++ackCounter % 16 === 0) socket.emit("chunk-ack",{roomId});
 
-      socket.emit("chunk-ack", { roomId });
     });
 
     socket.on("file-transfer-end", async ({ fileName, fileType }) => {
