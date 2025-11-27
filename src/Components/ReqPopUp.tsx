@@ -31,7 +31,7 @@ const ReqPopUp: React.FC<Props> = ({ sender, timeout = 10, filename, size,onAcce
   }, [timeout, onReject]);
 
   return (
-    <div className="top-10 z-10 fixed left-1/2 transform -translate-x-1/2 w-80 bg-white shadow-lg rounded-lg  overflow-hidden">
+    <div className="top-10 z-[1] fixed left-1/2 transform -translate-x-1/2 w-80 bg-white shadow-lg rounded-lg  overflow-hidden">
   {/* Top border progress */}
   <div
     className={`absolute transition-all duration-200 top-0 left-0 h-1 bg-green-500 ${progress < 40 && "bg-red-600"}`}
