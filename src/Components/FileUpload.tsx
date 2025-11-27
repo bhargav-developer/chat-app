@@ -45,7 +45,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
 
     const { file, id } = uploadStatus;
 
-    // Send metadata
     socket.emit("file-meta", {
       roomId,
       fileName: file.name,
@@ -53,42 +52,36 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
       size: file.size,
     });
 
-    const stream = file.stream().getReader();   // FAST STREAM READER
     let sentBytes = 0;
     let seq = 0;
+    let offset = 0;
 
     updateFileStatus(id, { status: "uploading" });
 
+    const waitForChunkAck = () =>
+      new Promise((resolve) => socket.once("chunk-ack", resolve));
 
-    let sendChunk = true;
+    while (offset < file.size) {
+      const nextOffset = offset + CHUNK_SIZE;
+      const chunk = await file.slice(offset, nextOffset).arrayBuffer();
 
-    const waitForChunkAck = () => {
-      return new Promise((resolve) => {
-        socket.once("chunk-ack", (data) => resolve(data));
+      socket.emit("send-file-chunk", {
+        roomId,
+        fileName: file.name,
+        seq,
+        buffer: chunk,
       });
-    };
 
-while (true) {
-  const { done, value } = await stream.read();
-  if (done) break;
+      sentBytes += chunk.byteLength;
+      offset = nextOffset;
+      seq++;
 
-  socket.emit("send-file-chunk", {
-    roomId,
-    fileName: file.name,
-    seq,
-    buffer: value,
-  });
+      updateFileStatus(id, {
+        progress: Math.round((sentBytes / file.size) * 100),
+      });
 
-  sentBytes += value.length;
-  seq++;
-
-  updateFileStatus(id, {
-    progress: Math.round((sentBytes / file.size) * 100),
-  });
-
-  await waitForChunkAck();  // Wait until event
-}
-
+      await waitForChunkAck();
+    }
 
     socket.emit("file-end", {
       roomId,
@@ -98,6 +91,7 @@ while (true) {
 
     updateFileStatus(id, { status: "completed" });
   };
+
 
 
 

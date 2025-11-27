@@ -19,83 +19,83 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   const socket = useSocketStore((state) => state.socket);
 
   const [files, setFiles] = useState<ReceivedFile[]>([]);
-  const fileChunksRef = useRef<Map<string, Uint8Array[]>>(new Map());
   const { roomId } = fileTransferStore();
+
+
   useEffect(() => {
     if (!socket) return;
 
-    const fileChunks = new Map<string, Uint8Array[]>();
-    const fileInfo = new Map<string, { size: number; type: string; roomId: string }>();
+    const fileWriters = new Map<
+      string,
+      { writer: FileSystemWritableFileStream; size: number; type: string }
+    >();
 
-    // --- Receive metadata ---
-    socket.on("meta-transfer", ({ fileName, size, fileType, roomId }) => {
-      fileChunks.set(fileName, []);
-      fileInfo.set(fileName, { size, type: fileType, roomId });
+    if (!("showSaveFilePicker" in window)) {
+      alert("Your browser does not support direct file streaming.\nPlease use Chrome or Edge.");
+      return;
+    }
 
-      setFiles(prev => [...prev, {
-        file: fileName,
-        size,
-        fileType,
-        progress: 0,
-        receivedBytes: 0,
-      }]);
+
+    socket.on("meta-transfer", async ({ fileName, size, fileType }) => {
+      // Ask user where to save (xyz.part)
+      // ask user where to save
+      const fileHandle = await (window as any).showSaveFilePicker({
+        suggestedName: fileName + ".part",
+      });
+
+
+      const writer = await fileHandle.createWritable();
+      fileWriters.set(fileName, { writer, size, type: fileType });
+
+      setFiles(prev => [
+        ...prev,
+        { file: fileName, size, progress: 0, receivedBytes: 0, fileType }
+      ]);
     });
 
-    // --- Receive chunks ---
-    socket.on("receive-file-chunk", ({ fileName, chunk }) => {
-      const arr = new Uint8Array(chunk);
-      fileChunks.get(fileName)?.push(arr);
-      let ackCounter = 0;
+    socket.on("receive-file-chunk", async ({ fileName, chunk }) => {
+      const entry = fileWriters.get(fileName);
+      if (!entry) return;
 
-      if (++ackCounter % 8 === 0) {
-        socket.emit("chunk-ack", { roomId });
-      }
+      const { writer, size } = entry;
+      const uint = new Uint8Array(chunk);
 
+      // Write chunk directly to disk
+      await writer.write(uint);
 
-      setFiles(prev => prev.map(f =>
-        f.file === fileName
-          ? {
-            ...f,
-            receivedBytes: f.receivedBytes + arr.length,
-            progress: Math.round(
-              ((f.receivedBytes + arr.length) / f.size) * 100
-            ),
-          }
-          : f
-      ));
+      setFiles(prev =>
+        prev.map(f =>
+          f.file === fileName
+            ? {
+              ...f,
+              receivedBytes: f.receivedBytes + uint.length,
+              progress: Math.round(((f.receivedBytes + uint.length) / size) * 100),
+            }
+            : f
+        )
+      );
 
+      socket.emit("chunk-ack", { roomId });
     });
 
-    // --- File done ---
-    socket.on("file-transfer-end", ({ fileName }) => {
-      const chunks = fileChunks.get(fileName);
-      const info = fileInfo.get(fileName);
-      if (!chunks || !info) return;
+    socket.on("file-transfer-end", async ({ fileName }) => {
+      const entry = fileWriters.get(fileName);
+      if (!entry) return;
 
-      const blob = new Blob(chunks as BlobPart[], { type: info.type });
-      const url = URL.createObjectURL(blob);
+      const { writer, type } = entry;
+      await writer.close();
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      a.click();
 
-      URL.revokeObjectURL(url);
-      fileChunks.delete(fileName);
-      fileInfo.delete(fileName);
+      fileWriters.delete(fileName);
     });
 
-
-    socket.on("close-file-transfer", () => {
-      if (!socket) return
-      onClose()
-    })
+    socket.on("close-file-transfer", () => onClose());
 
     return () => {
       socket.off("meta-transfer");
       socket.off("receive-file-chunk");
       socket.off("file-transfer-end");
-      socket.off("close-file-transfer")
+      socket.off("close-file-transfer");
     };
   }, [socket]);
 
