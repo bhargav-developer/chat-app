@@ -10,7 +10,6 @@ import FileRecieve from "@/Components/FileRecieve";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { fileTransferStore } from "@/lib/fileTransferStore";
-import FileUpload from "@/Components/FileUpload";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -20,73 +19,80 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, setUser } = useUserStore();
   const router = useRouter();
   const socket = useSocketStore((state) => state.socket);
-  const [recieve, setRecieve] = useState(false);
-  const [senderId, setSenderId] = useState<string | null>(null);
-  const { upload, setUpload } = fileTransferStore();
   const [recieveReq, setRecieveReq] = useState(false);
-  const { roomId, setRoomId } = fileTransferStore();
-  const [recieverName, setRecieveName] = useState<string>("");
+  const [recieve, setRecieve] = useState(false);
+  const [incoming, setIncoming] = useState<any>(null);
   const { setStatus } = useUsersStore();
+  const { setRoomId } = fileTransferStore();
 
   useEffect(() => {
     getUserInfo();
   }, []);
 
-
   useEffect(() => {
     if (!socket) return;
 
-    const handleFileTransferReq = (msg: { senderName: string; senderId: string; roomId: string }) => {
-      if (msg.senderName) {
-        setRecieveReq(true);
-        setRecieveName(msg.senderName);
-        setSenderId(msg.senderId);
-        setRoomId(msg.roomId)
-      } else {
-        setRecieveReq(false)
-      }
+    const handleFileTransferReq = (msg: { senderName: string; senderId: string; roomId: string; fileName: string; fileType: string; size: number }) => {
+      setIncoming(msg);
+      setRecieveReq(true);
+      setRoomId(msg.roomId);
     };
 
-    socket.on("update_users", (data) => {
-      Object.entries(data).forEach(([userId, statusData]) => {
-        setStatus(userId, statusData);
-      });
+    socket.on("receiver-file-transfer-request", handleFileTransferReq);
+
+    socket.on("rejected-file-transfer", (data) => {
+      toast.error(`${data ? `${data} rejected your file request` : "File transfer request rejected"}`);
     });
 
-    socket.on("receiver-file-transfer-request", handleFileTransferReq);
-    socket.on("rejected-file-transfer", (data) => {
-      toast.error(`${data ? `${data} rejected Your file request` : "file transfer request has been rejected"}`)
-    })
+    socket.on("update_users", (users) => {
+      Object.entries(users).forEach(([uid, state]) => setStatus(uid, state));
+    });
 
     return () => {
-      socket.off("receiver-file-transfer-request", handleFileTransferReq);
+      socket.off("receiver-file-transfer-request");
+      socket.off("rejected-file-transfer");
+      socket.off("update_users");
     };
   }, [socket]);
 
-  const handleReqAccept = () => {
-    if (!socket) return;
-    socket.emit("accept-file-transfer", { senderId, roomId, reciverId: user?.id });
+  const handleReqAccept = async () => {
+    if (!socket || !incoming) return;
+
+    const supportsFS = "showSaveFilePicker" in window;
+
+    try {
+      if (supportsFS) {
+        const handle = await (window as any).showSaveFilePicker({
+          suggestedName: incoming.fileName + ".part",
+        });
+        (window as any).__fileWriter = await handle.createWritable();
+      } else {
+        (window as any).__fileBuffers = []; // fallback for Firefox/Safari
+      }
+    } catch {
+      // If user cancels picker, stop transfer
+      socket.emit("reject-file-transfer", { from: incoming.senderId, roomId: incoming.roomId, userName: user?.name });
+      setRecieveReq(false);
+      return;
+    }
+
+    socket.emit("accept-file-transfer", { roomId: incoming.roomId });
     setRecieve(true);
-    setRoomId(roomId)
     setRecieveReq(false);
   };
 
   const handleReqReject = () => {
-    if (!socket) return;
+    if (socket && incoming) {
+      socket.emit("reject-file-transfer", { from: incoming.senderId, roomId: incoming.roomId, userName: user?.name });
+    }
     setRecieveReq(false);
-    socket.emit("reject-file-transfer", { from: senderId, roomId, userName: user?.name });
   };
 
   const getUserInfo = async () => {
     try {
       const res = await axios.get("/api/auth/me", { withCredentials: true });
       const { _id, firstName, lastName, email, avatar } = res.data.user;
-      setUser({
-        id: _id,
-        email,
-        name: `${firstName} ${lastName}`,
-        avatar,
-      });
+      setUser({ id: _id, email, name: `${firstName} ${lastName}`, avatar });
     } catch (error) {
       const err = error as AxiosError;
       if (err.status === 401) router.push("/login");
@@ -94,34 +100,23 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="relative flex h-screen w-full bg-white text-black overflow-hidden">
-
+    <div className="relative flex h-screen w-full overflow-hidden bg-white text-black">
       {user?.id && <SideBar />}
 
-      {/* Main content */}
-      <main
-        className="
-          flex-1 min-h-screen max-w-screen
-          pt-[64px] md:pt-0
-          transition-all
-        "
-      >
+      <main className="flex-1 min-h-screen pt-[64px] md:pt-0">
         {children}
 
-        {/* Popup layers */}
-        {recieveReq && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-50">
-            <ReqPopUp
-              sender={recieverName}
-              timeout={10}
-              onAccept={handleReqAccept}
-              onReject={handleReqReject}
-            />
-          </div>
+        {recieveReq && incoming && (
+          <ReqPopUp
+            sender={incoming.senderName}
+            filename={incoming.fileName}
+            size={incoming.size}
+            onAccept={handleReqAccept}
+            onReject={handleReqReject}
+          />
         )}
 
         {recieve && <FileRecieve onClose={() => setRecieve(false)} />}
-       
       </main>
     </div>
   );

@@ -5,9 +5,11 @@ type Props = {
   timeout?: number; // seconds
   onAccept: () => void;
   onReject: () => void;
+  filename: string;
+  size: Number
 };
 
-const ReqPopUp: React.FC<Props> = ({ sender, timeout = 10, onAccept, onReject }) => {
+const ReqPopUp: React.FC<Props> = ({ sender, timeout = 10, filename, size,onAccept, onReject }) => {
   const [progress, setProgress] = useState(100);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const ReqPopUp: React.FC<Props> = ({ sender, timeout = 10, onAccept, onReject })
   }, [timeout, onReject]);
 
   return (
-    <div className="top-10 fixed left-1/2 transform -translate-x-1/2 w-80 bg-white shadow-lg rounded-lg  overflow-hidden">
+    <div className="top-10 z-10 fixed left-1/2 transform -translate-x-1/2 w-80 bg-white shadow-lg rounded-lg  overflow-hidden">
   {/* Top border progress */}
   <div
     className={`absolute transition-all duration-200 top-0 left-0 h-1 bg-green-500 ${progress < 40 && "bg-red-600"}`}
@@ -59,7 +61,7 @@ const ReqPopUp: React.FC<Props> = ({ sender, timeout = 10, onAccept, onReject })
             onClick={onReject}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
           >
-            Reject
+            Reject , {filename}
           </button>
           <button
             onClick={onAccept}
