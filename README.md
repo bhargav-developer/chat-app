@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/logo.png" width="120px" alt="ChatSync Logo"/>
+  <img src="https://chatgpt.com/backend-api/estuary/content?id=file_00000000762c720796003799b155f700&ts=490138&p=fs&cid=1&sig=6d5229a05086469ad0f3d3c9221235e77e3770cdf5fc6fc4b2b03e60f852428e&v=0" width="120px" alt="ChatSync Logo"/>
   <h1><b>ChatSync — Real-Time Encrypted Chat & File Transfer ⚡</b></h1>
 
   <p align="center">
@@ -9,7 +9,6 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/MERN%20Stack-Full--Stack-blue" />
   <img src="https://img.shields.io/badge/WebSocket-Realtime-yellow" />
-  <img src="https://img.shields.io/badge/License-MIT-purple" />
 </div>
 
 ---
@@ -29,7 +28,6 @@ Every message and file transfer is **end-to-end encrypted**, ensuring **secure c
 | 📎 Chunk-based File Transfer (Large Files Supported) | ✔ |
 | 🧩 Microservices Architecture | ✔ |
 | 👤 Authentication (JWT) | ✔ |
-| 🌓 Light/Dark Theme | ✔ |
 | 🖥 Cross-Platform Browser Support | ✔ |
 | 📱 Mobile Responsive (TailwindCSS) | ✔ |
 
