@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://chatgpt.com/backend-api/estuary/content?id=file_00000000762c720796003799b155f700&ts=490138&p=fs&cid=1&sig=6d5229a05086469ad0f3d3c9221235e77e3770cdf5fc6fc4b2b03e60f852428e&v=0" width="120px" alt="ChatSync Logo"/>
+  <img src="https://res.cloudinary.com/doql04ndg/image/upload/v1764501865/646f45f7-4d4c-4d62-99bd-2b5384ef22f2_cqdrbt.png" width="120px" alt="ChatSync Logo"/>
   <h1><b>ChatSync — Real-Time Encrypted Chat & File Transfer ⚡</b></h1>
 
   <p align="center">
