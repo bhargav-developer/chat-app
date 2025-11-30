@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <img src="./assets/logo.png" width="120px" alt="ChatSync Logo"/>
+  <h1><b>ChatSync — Real-Time Encrypted Chat & File Transfer ⚡</b></h1>
 
-## Getting Started
+  <p align="center">
+    A next-gen messaging platform with <b>real-time communication, encrypted chat & ultra-fast file transfer</b> built on a scalable <b>Microservices Architecture</b>.
+  </p>
+  
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
+  <img src="https://img.shields.io/badge/MERN%20Stack-Full--Stack-blue" />
+  <img src="https://img.shields.io/badge/WebSocket-Realtime-yellow" />
+  <img src="https://img.shields.io/badge/License-MIT-purple" />
+</div>
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Overview
+**ChatSync** is a modern real-time chat & file transfer system designed for performance, privacy, and scalability.  
+Every message and file transfer is **end-to-end encrypted**, ensuring **secure communication** between users.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Feature | Status |
+|--------|--------|
+| ⚡ Real-time Messaging (WebSocket IO) | ✔ |
+| 🔐 End-to-End Encryption | ✔ |
+| 📎 Chunk-based File Transfer (Large Files Supported) | ✔ |
+| 🧩 Microservices Architecture | ✔ |
+| 👤 Authentication (JWT) | ✔ |
+| 🌓 Light/Dark Theme | ✔ |
+| 🖥 Cross-Platform Browser Support | ✔ |
+| 📱 Mobile Responsive (TailwindCSS) | ✔ |
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗️ Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🌐 Frontend
+- Next.js
+- React
+- Tailwind CSS
+- Zustand (State Management)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🖥 Backend
+- Node.js
+- Express
+- WebSockets / Socket.IO
+- Microservices Architecture
 
-## Deploy on Vercel
+### 💾 Database
+- MongoDB + Mongoose
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
