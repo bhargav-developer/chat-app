@@ -24,10 +24,10 @@ function page({ params }) {
   const socket = useSocketStore((state) => state.socket);
   const messagesEndRef = React.useRef(null);
   const [showPicker, setShowPicker] = React.useState(false);;
-  const {upload, setUpload} = fileTransferStore();
+  const { upload, setUpload } = fileTransferStore();
   const [isOpen, setIsOpen] = React.useState(false);
   const { statusMap, setStatus } = useUsersStore();
-  const {setRoomId} = fileTransferStore();
+  const { setRoomId } = fileTransferStore();
   const socketUrl = process.env.NEXT_PUBLIC_SOCKET
 
 
@@ -44,7 +44,7 @@ function page({ params }) {
   };
 
   const formatDateGroup = (timestamp) => {
-    if(!timestamp) return
+    if (!timestamp) return
     console.log(timestamp)
     const now = new Date();
     const input = new Date(timestamp);
@@ -100,13 +100,12 @@ function page({ params }) {
       Object.entries(data).forEach(([userId, statusData]) => {
         setStatus(userId, statusData);
       });
-
     });
 
 
 
     socket.on("file-transfer-start", (roomId) => {
-      if(upload) return
+      if (upload) return
       setUpload(true)
       setRoomId(roomId.roomId)
     })
@@ -135,75 +134,80 @@ function page({ params }) {
 
   const handleFileSender = async () => {
     try {
+      const checkReciverIsOnline = statusMap.get(User._id)?.online
+      if (!checkReciverIsOnline) {
+        toast.error(User ? `${User.firstName} ${User.lastName} is not online` : "User is not online")
+        return
+      }
       const res = socket.emit("sender-file-transfer-req", {
         senderId: user.id,
         receiverId: User._id,
         name: user.name
       })
-     toast.success(User ? `sent file request to ${User.firstName} ${User.lastName}`: "sent file request")
+      toast.success(User ? `sent file request to ${User.firstName} ${User.lastName}` : "sent file request")
     } catch (err) {
-      console.log(err)
-    }
+    console.log(err)
   }
+}
 
 
 
-  function formatAMPM(data) {
-    const date = new Date(data)
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+function formatAMPM(data) {
+  const date = new Date(data)
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
 
-    // Convert from 24-hour to 12-hour
-    hours = hours % 12;
-    hours = hours ? hours : 12;
+  // Convert from 24-hour to 12-hour
+  hours = hours % 12;
+  hours = hours ? hours : 12;
 
-    // Pad minutes
-    minutes = String(minutes).padStart(2, '0');
+  // Pad minutes
+  minutes = String(minutes).padStart(2, '0');
 
-    return `${hours}:${minutes} ${ampm}`;
-  }
-
-
-  const getMessages = async () => {
-    try {
-      const res = await axios.get(`${socketUrl}/messages/getMessage`, {
-        params: {
-          from: user.id,
-          to: User._id,
-        },
-      });
-      console.log("socketUrl: ",socketUrl)
-      setMessages(res.data.messages);
-
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  return `${hours}:${minutes} ${ampm}`;
+}
 
 
-
-
-
-
-  const sendMessage = async () => {
-    if (socket && message.trim()) {
-      socket.emit("send-message", {
-        content: message,
+const getMessages = async () => {
+  try {
+    const res = await axios.get(`${socketUrl}/messages/getMessage`, {
+      params: {
         from: user.id,
         to: User._id,
-      });
-      setMessage("");
-    }
-  };
+      },
+    });
+    console.log("socketUrl: ", socketUrl)
+    setMessages(res.data.messages);
 
-  
-
-
-
-  if (!user?.id || !User?._id) {
-    return <div className="p-4">Loading chat...</div>;
+  } catch (error) {
+    console.log(error);
   }
+};
+
+
+
+
+
+
+const sendMessage = async () => {
+  if (socket && message.trim()) {
+    socket.emit("send-message", {
+      content: message,
+      from: user.id,
+      to: User._id,
+    });
+    setMessage("");
+  }
+};
+
+
+
+
+
+if (!user?.id || !User?._id) {
+  return <div className="p-4">Loading chat...</div>;
+}
 return (
   <div className="flex h-full flex-col">
     {/* Header */}
@@ -248,9 +252,8 @@ return (
       {messages.map((msg, index) => (
         <div key={index}>
           <div
-            className={`flex ${
-              msg.from === user.id ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${msg.from === user.id ? "justify-end" : "justify-start"
+              }`}
           >
             {msg.from !== user.id && (
               <img
@@ -261,22 +264,20 @@ return (
             )}
 
             <div
-              className={`p-2 sm:p-3 ${
-                msg.from === user.id
-                  ? "bg-blue-600 text-white rounded-2xl rounded-tr-md"
-                  : "border border-gray-400 text-black rounded-2xl rounded-tl-md"
-              } max-w-[80%] sm:max-w-xs break-words`}
+              className={`p-2 sm:p-3 ${msg.from === user.id
+                ? "bg-blue-600 text-white rounded-2xl rounded-tr-md"
+                : "border border-gray-400 text-black rounded-2xl rounded-tl-md"
+                } max-w-[80%] sm:max-w-xs break-words`}
             >
               {msg.content || msg}
             </div>
           </div>
 
           <p
-            className={`text-gray-500 text-[10px] sm:text-xs ${
-              msg.from === user.id
-                ? "text-right"
-                : "text-left ml-10"
-            }`}
+            className={`text-gray-500 text-[10px] sm:text-xs ${msg.from === user.id
+              ? "text-right"
+              : "text-left ml-10"
+              }`}
           >
             {formatAMPM(msg.timeStamp)}
           </p>
@@ -294,7 +295,7 @@ return (
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="border border-gray-400 flex-1 sm:w-[100%] w-[1vw] p-2 rounded-xl text-sm"
+        className="border border-gray-400 flex-1 sm:w-[100%] p-2 rounded-xl text-sm"
         placeholder="Type your message..."
       />
 
@@ -310,7 +311,7 @@ return (
       </button>
     </div>
 
-     {upload && <FileUpload onClose={() => {setUpload(false)}} reciverId={User._id} />}
+    {upload && <FileUpload onClose={() => { setUpload(false) }} reciverId={User._id} />}
 
     {/* Emoji Picker */}
     <div
