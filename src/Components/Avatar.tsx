@@ -11,7 +11,7 @@ const Avatar: React.FC<prop> = ({ avatarUrl,
     isOnline = false }) => {
     return (
         <>
-            <div className='relative'>
+            <div className='relative min-h-12 min-w-12'>
                 <img className='h-12 w-12' src={avatarUrl} alt={altTitle} />
                 {
                     isOnline &&
