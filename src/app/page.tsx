@@ -8,6 +8,7 @@ import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-w
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { ContainerTextFlip } from "@/components/ui/container-text-flip";
 import LandingNavbar from "@/Components/LandingNavbar";
+import { Globe } from "@/components/ui/globe";
 
 const LandingPage = () => {
   const router = useRouter();
@@ -52,7 +53,7 @@ const LandingPage = () => {
   return (
     <div className="font-inter min-h-screen bg-black text-white">
       {/* Header */}
-      <LandingNavbar/>
+      <LandingNavbar />
 
 
       {/* HERO */}
@@ -69,7 +70,7 @@ const LandingPage = () => {
             <div className="mt-4 text-xl sm:text-2xl md:text-3xl font-semibold text-white/90">
               <ContainerTextFlip
                 words={[
-               "Send anything Lose nothing", "Share Anything Anytime Instantly", "Fast like lightning Safe like a vault", "Built for privacy Built for speed",
+                  "Send anything Lose nothing", "Share Anything Anytime Instantly", "Fast like lightning Safe like a vault", "Built for privacy Built for speed",
                 ]}
                 className="mx-auto"
               />
@@ -78,13 +79,13 @@ const LandingPage = () => {
             {/* DESCRIPTION */}
             <p className="text-gray-300 text-base sm:text-lg md:text-xl max-w-2xl mx-auto mt-6 leading-relaxed">
               A next-gen communication platform designed for unmatched speed,
-         security and seamless file sharing — built for people who don’t want limits.
+              security and seamless file sharing — built for people who don’t want limits.
             </p>
 
             {/* CTA BUTTON */}
-         <button
-  onClick={() => router.push("/login")}
-  className="
+            <button
+              onClick={() => router.push("/login")}
+              className="
     mt-10 px-8 py-3 text-base cursor-pointer sm:text-lg font-semibold rounded-xl
     transition-all duration-300
     bg-black/40 backdrop-blur-md
@@ -94,11 +95,11 @@ const LandingPage = () => {
     hover:shadow-[0_0_25px_rgba(236,72,153,0.55)]
     hover:scale-[1.03] active:scale-[0.97]
   "
->
-  <span className="bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent">
-    Start Chatting — It’s Free
-  </span>
-</button>
+            >
+              <span className="bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent">
+                Start Chatting — It’s Free
+              </span>
+            </button>
 
 
           </div>
@@ -154,6 +155,29 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      <div className="bg-background w-full h-full relative flex size-full items-center justify-center overflow-hidden border px-40 pt-8 pb-40 md:pb-60">
+        <span
+  className="
+    pointer-events-none
+    bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-transparent
+    dark:from-white dark:to-slate-900/10
+    text-center font-semibold leading-tight
+    whitespace-pre-wrap
+
+    text-3xl    /* 📱 mobile */
+    sm:text-4xl /* ⬆ small tablets */
+    md:text-6xl /* ⬆ tablets */
+    lg:text-7xl /* ⬆ laptops */
+    xl:text-8xl /* ⬆ large desktops */
+  "
+>
+  Globally connected, privately protected
+</span>
+
+        <Globe className="top-39" />
+        <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_200%,rgba(0,0,0,0.2),rgba(255,255,255,0))]" />
+      </div>
 
       {/* CTA */}
       <section className="py-28 text-center bg-black">
