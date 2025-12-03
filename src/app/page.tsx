@@ -1,76 +1,130 @@
-"use client"
-import React, { useEffect } from 'react';
-import { MessageSquare, Upload, Lock } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
+"use client";
 
-const App = () => {
+import React, { useEffect } from "react";
+import { MessageSquare, Upload, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
+import { EncryptedText } from "@/components/ui/encrypted-text";
+import { ContainerTextFlip } from "@/components/ui/container-text-flip";
+import LandingNavbar from "@/Components/LandingNavbar";
+
+const LandingPage = () => {
   const router = useRouter();
 
-
   const features = [
-    { icon: <MessageSquare className="w-8 h-8 text-indigo-600" />, title: 'Real-Time Chat', desc: 'Instant messaging with zero delay, perfect for team or individual use.' },
-    { icon: <Upload className="w-8 h-8 text-indigo-600" />, title: 'Fast File Transfers', desc: 'Send large files instantly — supports up to 5GB uploads.' },
-    { icon: <Lock className="w-8 h-8 text-indigo-600" />, title: 'End-to-End Encryption', desc: 'Secure conversations and file sharing with full E2E encryption.' }
+    {
+      icon: <MessageSquare className="w-8 h-8 text-fuchsia-400" />,
+      title: "Real-Time Chat",
+      desc: "Instant messaging with zero delay — built for real connections.",
+    },
+    {
+      icon: <Upload className="w-8 h-8 text-fuchsia-400" />,
+      title: "Fast File Transfers",
+      desc: "Send files up to 5GB with resumable transfers. No limits, no stress.",
+    },
+    {
+      icon: <Lock className="w-8 h-8 text-fuchsia-400" />,
+      title: "End-to-End Encryption",
+      desc: "Every message and file is protected — privacy is built into the core.",
+    },
   ];
 
   const faqs = [
-    { q: 'Is ChatSync free to use?', a: 'Yes' },
-    { q: 'Can I send large files?', a: 'Yes, it would be bottlenecked compared to other services, but you can resume your file transfer at any stage — and that’s the point that makes it great.' },
-    { q: 'Is my data secure?', a: 'Absolutely — we use modern encryption protocols end-to-end.' }
+    { q: "Is ChatSync free to use?", a: "Yes." },
+    {
+      q: "Can I send large files?",
+      a: "Yes — file uploads are resumable and optimized for reliability.",
+    },
+    {
+      q: "Is my data secure?",
+      a: "Absolutely. All communications are secured with end-to-end encryption.",
+    },
   ];
 
   useEffect(() => {
-    checkExistingUser()
-  }, [])
-
-  const checkExistingUser = async () => {
-    try {
-      const res = await axios.get("/api/auth/me", { withCredentials: true });
-      if (res.data && res.status === 200) {
-        router.push("/dashboard")
-      }
-
-    } catch (err) {
-      console.log(err)
-    }
-  }
+    axios
+      .get("/api/auth/me", { withCredentials: true })
+      .then((res) => res.status === 200 && router.push("/dashboard"))
+      .catch(() => { });
+  }, []);
 
   return (
-    <div className="font-inter text-gray-800 bg-gray-50">
+    <div className="font-inter min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-indigo-600">ChatSync</h1>
-          <nav className="hidden md:flex space-x-6 text-sm font-medium">
-            <a href="#features" className="hover:text-indigo-600 transition">Features</a>
-            <a href="#faq" className="hover:text-indigo-600 transition">FAQ</a>
-            <a onClick={() => router.push("/login")} className="hover:text-indigo-600 cursor-pointer transition">Get Started</a>
-          </nav>
-        </div>
-      </header>
+      <LandingNavbar/>
 
-      {/* Hero */}
-      <section className="bg-indigo-600 text-white py-24 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6">Real-Time Chat & Secure File Sharing</h2>
-          <p className="text-lg sm:text-xl mb-8">Lightning-fast messaging and encrypted file transfers — all in one sleek platform.</p>
-          <a onClick={() => router.push("/login")} className="inline-block bg-white text-indigo-600 px-6 py-3 rounded-md font-semibold cursor-pointer hover:bg-gray-100 transition">
-            Try ChatSync 
-          </a>
-        </div>
+
+      {/* HERO */}
+      <section className="relative  -full overflow-hidden">
+        <BackgroundBeamsWithCollision className="bg-black">
+          <div className="relative z-20 px-6 py-32 max-w-4xl mx-auto text-center">
+
+            {/* MAIN HEADLINE */}
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">
+              Chat without limits
+            </h2>
+
+            {/* SUBTITLE (FLIP TEXT) */}
+            <div className="mt-4 text-xl sm:text-2xl md:text-3xl font-semibold text-white/90">
+              <ContainerTextFlip
+                words={[
+               "Send anything Lose nothing", "Share Anything Anytime Instantly", "Fast like lightning Safe like a vault", "Built for privacy Built for speed",
+                ]}
+                className="mx-auto"
+              />
+            </div>
+
+            {/* DESCRIPTION */}
+            <p className="text-gray-300 text-base sm:text-lg md:text-xl max-w-2xl mx-auto mt-6 leading-relaxed">
+              A next-gen communication platform designed for unmatched speed,
+         security and seamless file sharing — built for people who don’t want limits.
+            </p>
+
+            {/* CTA BUTTON */}
+         <button
+  onClick={() => router.push("/login")}
+  className="
+    mt-10 px-8 py-3 text-base cursor-pointer sm:text-lg font-semibold rounded-xl
+    transition-all duration-300
+    bg-black/40 backdrop-blur-md
+    border border-fuchsia-500/40
+    hover:border-fuchsia-500
+    shadow-[0_0_12px_rgba(236,72,153,0.25)]
+    hover:shadow-[0_0_25px_rgba(236,72,153,0.55)]
+    hover:scale-[1.03] active:scale-[0.97]
+  "
+>
+  <span className="bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent">
+    Start Chatting — It’s Free
+  </span>
+</button>
+
+
+          </div>
+
+
+        </BackgroundBeamsWithCollision>
       </section>
 
-      {/* Features */}
-      <section id="features" className="py-20 bg-white px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <h3 className="text-3xl font-bold mb-12">What Makes ChatSync Great</h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10 text-left">
+
+      <hr className="border border-pink-500/25" />
+      {/* FEATURES */}
+      <section id="features" className="py-28 bg-black text-white px-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <h3 className="text-4xl font-extrabold mb-14 tracking-tight">
+            Why should You try ChatSync
+          </h3>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
             {features.map((f, idx) => (
-              <div key={idx} className="bg-gray-50 p-6 rounded-xl border hover:shadow transition">
-                <div className="mb-4">{f.icon}</div>
-                <h4 className="text-xl font-semibold mb-2">{f.title}</h4>
-                <p className="text-gray-600">{f.desc}</p>
+              <div
+                key={idx}
+                className="p-8 border border-white/10 rounded-2xl bg-black/40 hover:bg-black/60 hover:border-fuchsia-500 transition backdrop-blur-xl"
+              >
+                <div className="mb-6">{f.icon}</div>
+                <h4 className="text-2xl font-semibold mb-3">{f.title}</h4>
+                <p className="text-gray-300 leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -78,14 +132,23 @@ const App = () => {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-20 bg-gray-100 px-6">
+      <section
+        id="faq"
+        className="py-28 bg-gradient-to-b from-black to-gray-900 px-6"
+      >
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-3xl font-bold text-center mb-12">FAQs</h3>
+          <h3 className="text-4xl font-extrabold text-center mb-14 tracking-tight">
+            Frequently Asked Questions
+          </h3>
+
           <div className="space-y-6">
             {faqs.map((item, i) => (
-              <div key={i} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div
+                key={i}
+                className="p-6 rounded-2xl bg-black/60 border border-white/10 hover:border-fuchsia-500 transition backdrop-blur"
+              >
                 <h4 className="text-lg font-semibold mb-2">{item.q}</h4>
-                <p className="text-gray-600">{item.a}</p>
+                <p className="text-gray-300">{item.a}</p>
               </div>
             ))}
           </div>
@@ -93,22 +156,36 @@ const App = () => {
       </section>
 
       {/* CTA */}
-      <section id="cta" className="bg-indigo-600 text-white py-20 text-center px-6">
+      <section className="py-28 text-center bg-black">
         <div className="max-w-xl mx-auto">
-          <h3 className="text-3xl sm:text-4xl font-bold mb-4">Ready to Start?</h3>
-          <p className="text-lg mb-6">Create your account and start chatting securely now.</p>
-          <a onClick={() => router.push("/login")} className="bg-white text-indigo-600 px-6 py-3 rounded-md font-semibold hover:bg-gray-100 cursor-pointer transition">
-            Get Started for Free
-          </a>
+          <h3 className="text-4xl font-extrabold mb-6 tracking-tight">
+            Ready to join the future of communication?
+          </h3>
+          <p className="text-lg text-gray-300 mb-10">
+            Create your free account and start chatting securely today.
+          </p>
+
+          <button
+            onClick={() => router.push("/login")}
+            className="px-12 py-4 text-lg font-semibold rounded-xl transition-all
+              bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500
+              text-white shadow-[0_0_15px_rgba(236,72,153,0.5)]
+              hover:shadow-[0_0_40px_rgba(236,72,153,0.8)]
+              hover:scale-[1.04] active:scale-[0.98] duration-300"
+          >
+            Get Started — It’s Free
+          </button>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white border-t py-10 px-6 text-sm text-center text-gray-500">
-        <p>&copy; {new Date().getFullYear()} ChatSync. All rights reserved.</p>
+      {/* FOOTER */}
+      <footer className="bg-black border-t border-white/10 py-12 px-6 text-center text-gray-400">
+        <p>
+          © {new Date().getFullYear()} ChatSync — Designed for the future.
+        </p>
       </footer>
     </div>
   );
 };
 
-export default App;
+export default LandingPage;
