@@ -142,16 +142,10 @@ export default function Home() {
         </header>
 
         {/* Main Content */}
-        <main className="px-6 py-8 space-y-8">
-          {/* Dashboard Cards */}
-          {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <StatCard title="Total Users" value="1,234" icon={<Users className="text-indigo-500" />} />
-            <StatCard title="Messages Sent" value="12,345" icon={<MessageSquare className="text-green-500" />} />
-            <StatCard title="Active Sessions" value="42" icon={<Activity className="text-orange-500" />} />
-          </div> */}
+        <main className="px-6 py-8  space-y-8">
 
           {/* Recent Chats */}
-          <section className="bg-white shadow  rounded-lg p-6">
+          <section className="bg-white shadow pl-5  rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">Recent Chats</h2>
               {/* <button className="text-sm text-indigo-600 hover:underline">View all</button> */}
@@ -160,7 +154,7 @@ export default function Home() {
             <div className="space-y-4">
               {recentChats && recentChats.map((chat, index) => (
                 <div onClick={() => router.push(`/dashboard/chats/${chat.userId}`)} key={index} className="flex items-center justify-between hover:bg-gray-50 p-2 cursor-pointer rounded-md transition">
-                  <div className="flex items-center gap-4">
+                  <div className="flex justify-center items-center gap-4">
                     <Avatar avatarUrl={chat.avatar} isOnline={statusMap.get(chat.userId)?.online} />
                     <div>
                       <p className="font-medium text-gray-800">{chat.firstName}</p>
@@ -181,15 +175,3 @@ export default function Home() {
   );
 }
 
-// Dashboard Card Component
-// function StatCard({ title, value, icon }: { title: string; value: string; icon: React.ReactNode }) {
-//   return (
-//     <div className="bg-white rounded-lg shadow p-5 flex items-center gap-4">
-//       <div className="p-3 bg-gray-100 rounded-full">{icon}</div>
-//       <div>
-//         <p className="text-sm text-gray-500">{title}</p>
-//         <p className="text-2xl font-bold text-indigo-600 mt-1">{value}</p>
-//       </div>
-//     </div>
-//   );
-// }

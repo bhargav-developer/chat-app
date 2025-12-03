@@ -103,7 +103,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="relative flex h-screen w-full overflow-hidden bg-white text-black">
       {user?.id && <SideBar />}
 
-      <main className="flex-1 min-h-screen min-w-screen pt-[64px] md:pt-0">
+      <main className="flex-1 overflow-auto pt-[64px] md:pt-0">
         {children}
 
         {recieveReq && incoming && (
