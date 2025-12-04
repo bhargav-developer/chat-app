@@ -9,27 +9,11 @@ import { EncryptedText } from "@/components/ui/encrypted-text";
 import { ContainerTextFlip } from "@/components/ui/container-text-flip";
 import LandingNavbar from "@/Components/LandingNavbar";
 import { Globe } from "@/components/ui/globe";
+import { CanvasRevealEffectDemo } from "@/Components/CanvasRevelDemo";
 
 const LandingPage = () => {
   const router = useRouter();
 
-  const features = [
-    {
-      icon: <MessageSquare className="w-8 h-8 text-fuchsia-400" />,
-      title: "Real-Time Chat",
-      desc: "Instant messaging with zero delay — built for real connections.",
-    },
-    {
-      icon: <Upload className="w-8 h-8 text-fuchsia-400" />,
-      title: "Fast File Transfers",
-      desc: "Send files up to 5GB with resumable transfers. No limits, no stress.",
-    },
-    {
-      icon: <Lock className="w-8 h-8 text-fuchsia-400" />,
-      title: "End-to-End Encryption",
-      desc: "Every message and file is protected — privacy is built into the core.",
-    },
-  ];
 
   const faqs = [
     { q: "Is ChatSync free to use?", a: "Yes." },
@@ -57,9 +41,10 @@ const LandingPage = () => {
 
 
       {/* HERO */}
-      <section className="relative  -full overflow-hidden">
+      {/* HERO */}
+      <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
         <BackgroundBeamsWithCollision className="bg-black">
-          <div className="relative z-20 px-6 py-32 max-w-4xl mx-auto text-center">
+          <div className="relative z-20 px-6 max-w-4xl mx-auto text-center">
 
             {/* MAIN HEADLINE */}
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">
@@ -70,7 +55,10 @@ const LandingPage = () => {
             <div className="mt-4 text-xl sm:text-2xl md:text-3xl font-semibold text-white/90">
               <ContainerTextFlip
                 words={[
-                  "Send anything Lose nothing", "Share Anything Anytime Instantly", "Fast like lightning Safe like a vault", "Built for privacy Built for speed",
+                  "Send anything Lose nothing",
+                  "Share Anything Anytime Instantly",
+                  "Fast like lightning Safe like a vault",
+                  "Built for privacy Built for speed",
                 ]}
                 className="mx-auto"
               />
@@ -86,51 +74,32 @@ const LandingPage = () => {
             <button
               onClick={() => router.push("/login")}
               className="
-    mt-10 px-8 py-3 text-base cursor-pointer sm:text-lg font-semibold rounded-xl
-    transition-all duration-300
-    bg-black/40 backdrop-blur-md
-    border border-fuchsia-500/40
-    hover:border-fuchsia-500
-    shadow-[0_0_12px_rgba(236,72,153,0.25)]
-    hover:shadow-[0_0_25px_rgba(236,72,153,0.55)]
-    hover:scale-[1.03] active:scale-[0.97]
-  "
+          mt-10 px-8 py-3 text-base cursor-pointer sm:text-lg font-semibold rounded-xl
+          transition-all duration-300
+          bg-black/40 backdrop-blur-md
+          border border-fuchsia-500/40
+          hover:border-fuchsia-500
+          shadow-[0_0_12px_rgba(236,72,153,0.25)]
+          hover:shadow-[0_0_25px_rgba(236,72,153,0.55)]
+          hover:scale-[1.03] active:scale-[0.97]
+        "
             >
               <span className="bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent">
                 Start Chatting — It’s Free
               </span>
             </button>
 
-
           </div>
-
-
         </BackgroundBeamsWithCollision>
       </section>
 
 
+
       <hr className="border border-pink-500/25" />
       {/* FEATURES */}
-      <section id="features" className="py-28 bg-black text-white px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <h3 className="text-4xl font-extrabold mb-14 tracking-tight">
-            Why should You try ChatSync
-          </h3>
+     
+     <CanvasRevealEffectDemo/>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {features.map((f, idx) => (
-              <div
-                key={idx}
-                className="p-8 border border-white/10 rounded-2xl bg-black/40 hover:bg-black/60 hover:border-fuchsia-500 transition backdrop-blur-xl"
-              >
-                <div className="mb-6">{f.icon}</div>
-                <h4 className="text-2xl font-semibold mb-3">{f.title}</h4>
-                <p className="text-gray-300 leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* FAQ */}
       <section
@@ -158,7 +127,7 @@ const LandingPage = () => {
 
       <div className="bg-background w-full h-full relative flex size-full items-center justify-center overflow-hidden border px-40 pt-8 pb-40 md:pb-60">
         <span
-  className="
+          className="
     pointer-events-none
     bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-transparent
     dark:from-white dark:to-slate-900/10
@@ -171,9 +140,9 @@ const LandingPage = () => {
     lg:text-7xl /* ⬆ laptops */
     xl:text-8xl /* ⬆ large desktops */
   "
->
-  Globally connected, privately protected
-</span>
+        >
+          Globally connected, privately protected
+        </span>
 
         <Globe className="top-39" />
         <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_200%,rgba(0,0,0,0.2),rgba(255,255,255,0))]" />
