@@ -122,11 +122,11 @@ const LandingPage = () => {
     text-center font-semibold leading-tight
     whitespace-pre-wrap
 
-    text-3xl    /* 📱 mobile */
-    sm:text-4xl /* ⬆ small tablets */
-    md:text-6xl /* ⬆ tablets */
-    lg:text-7xl /* ⬆ laptops */
-    xl:text-8xl /* ⬆ large desktops */
+    text-3xl    
+    sm:text-4xl 
+    md:text-6xl 
+    lg:text-7xl 
+    xl:text-8xl  
   "
         >
           Features
