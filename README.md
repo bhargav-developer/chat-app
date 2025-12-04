@@ -4,20 +4,32 @@
   <h1><b>ChatSync — Real-Time Encrypted Chat & File Transfer ⚡</b></h1>
 
   <p align="center">
-    A next-gen messaging platform enabling <b>real-time communication, end-to-end encryption, and ultra-fast file transfers</b> — powered by a scalable <b>Microservices Architecture</b>.
+    A next-gen messaging platform enabling <b>real-time communication, end-to-end encryption, and ultra-fast file transfers</b> — powered by a scalable <b>Microservices + Serverless Architecture</b>.
   </p>
+
+  <!-- 🔥 LIVE WEBSITE BUTTON -->
+  <a href="https://bhargav-msgapp.vercel.app" target="_blank">
+    <img src="https://img.shields.io/badge/⚡ LIVE%20WEBSITE-Open%20Now-000000?style=for-the-badge&logo=vercel&logoColor=white" />
+  </a>
+  <br/>
+  <a href="https://bhargav-msgapp.vercel.app" target="_blank">
+    <b>🌐 https://bhargav-msgapp.vercel.app</b>
+  </a>
+
+  <br/><br/>
 
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/MERN%20Stack-Full--Stack-blue" />
   <img src="https://img.shields.io/badge/WebSocket-Realtime-yellow" />
   <img src="https://img.shields.io/badge/Shadcn%20UI-Beautiful%20Components-purple" />
+  <img src="https://img.shields.io/badge/Next.js-Serverless%20Backend-black" />
 </div>
 
 ---
 
 ## 🚀 Overview
 **ChatSync** is a high-performance encrypted messaging system built for reliability, privacy, and scale.  
-Every conversation and every file is **protected via end-to-end encryption**, ensuring zero-access messaging.
+All messages and file transfers use **end-to-end encryption**, ensuring **true zero-access messaging**.
 
 ---
 
@@ -29,25 +41,33 @@ Every conversation and every file is **protected via end-to-end encryption**, en
 | 🔐 End-to-End Encryption | ✔ |
 | 📎 Chunk-Based Large File Transfer | ✔ |
 | 🚅 Microservices Architecture | ✔ |
+| 🧬 Serverless Backend (Next.js API Routes) | ✔ |
 | 👤 JWT Authentication | ✔ |
 | 🖥 Cross-Platform Browser Support | ✔ |
-| 📱 Mobile Responsive | ✔ |
+| 📱 Fully Responsive UI | ✔ |
 
 ---
 
 ## 🏗️ Tech Stack
 
-### 🌐 Frontend
-- **Next.js**
+### 🌐 Frontend / Serverless Backend
+- **Next.js (Serverless API Routes) — hosted on Vercel**
 - **React**
 - **Tailwind CSS**
-- **Shadcn UI Components**
+- **Shadcn UI**
 - **Zustand (State Management)**
 
-### 🖥 Backend
+### 🔌 Real-Time Socket Microservice
+ChatSync uses a dedicated WebSocket service for high-speed bi-directional communication.
+
+🔗 **Socket Server Repository:** https://github.com/bhargav-developer/socket-server
+
+> Handles: message sync, file chunk streaming, delivery receipts, online status, and typing indicators.
+
+### 🖥 Backend Services
 - **Node.js**
 - **Express**
-- **WebSockets / Socket.IO**
+- **Socket.IO**
 - **Microservices Architecture**
 
 ### 💾 Database
