@@ -10,10 +10,29 @@ import { ContainerTextFlip } from "@/components/ui/container-text-flip";
 import LandingNavbar from "@/Components/LandingNavbar";
 import { Globe } from "@/components/ui/globe";
 import { CanvasRevealEffectDemo } from "@/Components/CanvasRevelDemo";
+import FancyTestimonialsSlider from "@/components/ui/testimonal-slider";
 
 const LandingPage = () => {
   const router = useRouter();
 
+
+  const testimonials = [
+  {
+    img: "https://avatar.vercel.sh/karthik",
+    quote: "ChatSync has completely replaced every other messaging app for our team — the speed and reliability are unbelievable.",
+    name: "Arun",
+  },
+  {
+    img: "https://avatar.vercel.sh/nick",
+    quote: "Sending large files without compression or upload failures feels like magic",
+    name: "Chandan",
+  },
+    {
+    img: "https://avatar.vercel.sh/42",
+    quote: "Sending large files without compression or upload failures feels like magic",
+    name: "Prasidh",
+  },
+]
 
   const faqs = [
     { q: "Is ChatSync free to use?", a: "Yes." },
@@ -124,6 +143,23 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+     <section className="py-28 bg-gradient-to-b from-gray-900 to-black px-6">
+  <div className="max-w-6xl mx-auto text-center">
+    <h3 className="text-4xl font-extrabold mb-10 tracking-tight">
+      What People Are Saying
+    </h3>
+    <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-16">
+      Trusted by developers and creators — real feedback from people who use ChatSync.
+    </p>
+  </div>
+
+  <FancyTestimonialsSlider
+    testimonials={testimonials}
+    autorotateTiming={5000}
+  />
+</section>
+
 
       <div className="bg-background w-full h-full relative flex size-full items-center justify-center overflow-hidden border px-40 pt-8 pb-40 md:pb-60">
         <span

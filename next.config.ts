@@ -4,7 +4,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
    images: {
-    domains: ["images.unsplash.com","randomuser.me"],
+    domains: ["images.unsplash.com","randomuser.me","https://avatar.vercel.sh/karthik","avatar.vercel.sh"],
   },
     eslint: {
     ignoreDuringBuilds: true,
