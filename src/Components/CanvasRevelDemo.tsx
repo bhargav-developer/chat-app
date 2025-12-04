@@ -8,7 +8,7 @@ import { MessageSquare, Upload, Lock } from "lucide-react"; // <-- your app icon
 export function CanvasRevealEffectDemo() {
   return (
     <>
-      <div className="py-20 flex flex-col lg:flex-row items-center justify-center bg-white dark:bg-black w-full gap-4 mx-auto px-8">
+      <div className="py-10 flex flex-col lg:flex-row items-center justify-center bg-white dark:bg-black w-full gap-4 mx-auto px-8">
         
         {/* CARD 1 - Chat */}
         <Card title="Real-Time Chat" icon={<MessageSquare className="w-12 h-12 text-fuchsia-400" />}>

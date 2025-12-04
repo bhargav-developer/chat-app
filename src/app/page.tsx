@@ -17,22 +17,22 @@ const LandingPage = () => {
 
 
   const testimonials = [
-  {
-    img: "https://avatar.vercel.sh/karthik",
-    quote: "ChatSync has completely replaced every other messaging app for our team — the speed and reliability are unbelievable.",
-    name: "Arun",
-  },
-  {
-    img: "https://avatar.vercel.sh/nick",
-    quote: "Sending large files without compression or upload failures feels like magic",
-    name: "Chandan",
-  },
     {
-    img: "https://avatar.vercel.sh/42",
-    quote: "Sending large files without compression or upload failures feels like magic",
-    name: "Prasidh",
-  },
-]
+      img: "https://avatar.vercel.sh/karthik",
+      quote: "ChatSync has completely replaced every other messaging app for our team — the speed and reliability are unbelievable.",
+      name: "Arun",
+    },
+    {
+      img: "https://avatar.vercel.sh/nick",
+      quote: "Sending large files without compression or upload failures feels like magic",
+      name: "Chandan",
+    },
+    {
+      img: "https://avatar.vercel.sh/42",
+      quote: "Sending large files without compression or upload failures feels like magic",
+      name: "Prasidh",
+    },
+  ]
 
   const faqs = [
     { q: "Is ChatSync free to use?", a: "Yes." },
@@ -55,13 +55,11 @@ const LandingPage = () => {
 
   return (
     <div className="font-inter min-h-screen bg-black text-white">
-      {/* Header */}
-      <LandingNavbar />
 
+        <LandingNavbar />  
 
-      {/* HERO */}
-      {/* HERO */}
       <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
+
         <BackgroundBeamsWithCollision className="bg-black">
           <div className="relative z-20 px-6 max-w-4xl mx-auto text-center">
 
@@ -114,10 +112,27 @@ const LandingPage = () => {
 
 
 
-      <hr className="border border-pink-500/25" />
       {/* FEATURES */}
-     
-     <CanvasRevealEffectDemo/>
+      <div id="features" className="bg-white py-10 flex flex-col justify-center align-center">
+        <span
+          className="
+    pointer-events-none
+    bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-transparent
+    dark:from-white dark:to-slate-900/10
+    text-center font-semibold leading-tight
+    whitespace-pre-wrap
+
+    text-3xl    /* 📱 mobile */
+    sm:text-4xl /* ⬆ small tablets */
+    md:text-6xl /* ⬆ tablets */
+    lg:text-7xl /* ⬆ laptops */
+    xl:text-8xl /* ⬆ large desktops */
+  "
+        >
+          Features
+        </span>
+        <CanvasRevealEffectDemo />
+      </div>
 
 
       {/* FAQ */}
@@ -144,21 +159,19 @@ const LandingPage = () => {
         </div>
       </section>
 
-     <section className="py-28 bg-gradient-to-b from-gray-900 to-black px-6">
-  <div className="max-w-6xl mx-auto text-center">
-    <h3 className="text-4xl font-extrabold mb-10 tracking-tight">
-      What People Are Saying
-    </h3>
-    <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-16">
-      Trusted by developers and creators — real feedback from people who use ChatSync.
-    </p>
-  </div>
+      <section id="testimonials" className="py-28 bg-gradient-to-b from-gray-900 to-black px-6">
+        <div className="max-w-6xl mx-auto text-center">
+          <h3 className="text-4xl font-extrabold mb-10 tracking-tight">
+            What People Are Saying
+          </h3>
+  
+        </div>
 
-  <FancyTestimonialsSlider
-    testimonials={testimonials}
-    autorotateTiming={5000}
-  />
-</section>
+        <FancyTestimonialsSlider
+          testimonials={testimonials}
+          autorotateTiming={5000}
+        />
+      </section>
 
 
       <div className="bg-background w-full h-full relative flex size-full items-center justify-center overflow-hidden border px-40 pt-8 pb-40 md:pb-60">
