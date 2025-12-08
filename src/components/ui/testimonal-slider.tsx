@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
@@ -8,7 +8,7 @@ interface Testimonial {
   img: string
   quote: string
   name: string
-  role?: string
+  role: string
 }
 
 export default function FancyTestimonialsSlider({
@@ -43,10 +43,7 @@ export default function FancyTestimonialsSlider({
     <div className="mx-auto w-full max-w-3xl px-4 text-center sm:px-6">
       {/* Testimonial image */}
       <div className="relative h-24 sm:h-32">
-        <div className="pointer-events-none absolute top-0 left-1/2 h-[320px] w-[320px] -translate-x-1/2 before:absolute before:inset-0 before:-z-10 before:rounded-full
-          before:bg-gradient-to-b before:from-fuchsia-500/25 before:via-purple-500/15 before:to-purple-500/0
-          sm:h-[480px] sm:w-[480px]"
-        >
+        <div className="pointer-events-none absolute top-0 left-1/2 h-[320px] w-[320px] -translate-x-1/2 before:absolute before:inset-0 before:-z-10 before:rounded-full before:bg-gradient-to-b before:from-cyan-500/25 before:via-cyan-500/5 before:via-25% before:to-cyan-500/0 before:to-75% sm:h-[480px] sm:w-[480px]">
           <div className="h-24 [mask-image:_linear-gradient(0deg,transparent,theme(colors.white)_20%,theme(colors.white))] sm:h-32">
             {testimonials.map((testimonial, index) => (
               <Transition
@@ -74,8 +71,7 @@ export default function FancyTestimonialsSlider({
           </div>
         </div>
       </div>
-
-      {/* Quote text */}
+      {/* Text */}
       <div className="mb-6 transition-all delay-300 duration-150 ease-in-out sm:mb-9">
         <div className="relative flex flex-col" ref={testimonialsRef}>
           {testimonials.map((testimonial, index) => (
@@ -90,33 +86,31 @@ export default function FancyTestimonialsSlider({
               leaveTo="opacity-0 translate-x-4"
               beforeEnter={() => heightFix()}
             >
-              <div className="px-2 text-xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent before:content-['\201C'] after:content-['\201D'] sm:px-0 sm:text-2xl">
+              <div className="px-2 text-lg font-bold text-cyan-900 before:content-['\201C'] after:content-['\201D'] sm:px-0 sm:text-xl lg:text-2xl">
                 {testimonial.quote}
               </div>
             </Transition>
           ))}
         </div>
       </div>
-
-      {/* Selector Buttons */}
+      {/* Buttons */}
       <div className="-m-1 flex flex-wrap justify-center gap-1 sm:gap-1.5">
         {testimonials.map((testimonial, index) => (
           <button
             key={index}
-            className={`m-1 inline-flex justify-center rounded-full px-3 py-1.5 text-xs whitespace-nowrap shadow-sm transition-colors duration-150 focus-visible:ring focus-visible:ring-purple-500 focus-visible:outline-none 
-              ${
-                active === index
-                  ? "bg-fuchsia-500 text-white shadow-fuchsia-900/30"
-                  : "bg-white/5 text-fuchsia-300 hover:bg-fuchsia-500/10"
-              }`}
+            className={`m-1 inline-flex justify-center rounded-full px-2 py-1 text-xs whitespace-nowrap shadow-sm transition-colors duration-150 focus-visible:ring focus-visible:ring-cyan-300 focus-visible:outline-none sm:px-3 sm:py-1.5 sm:text-xs dark:focus-visible:ring-cyan-600 ${active === index ? "bg-cyan-500 text-white shadow-cyan-950/10" : "bg-white text-cyan-900 hover:bg-cyan-100"}`}
             onClick={() => {
               setActive(index)
               setAutorotate(false)
             }}
           >
-            <span className="truncate">{testimonial.name}</span>
-            {" "}
-            <span className="truncate opacity-60">{testimonial.role}</span>
+            <span className="truncate">{testimonial.name}</span>{" "}
+            <span
+              className={`${active === index ? "text-cyan-200" : "text-cyan-300"}`}
+            >
+              -
+            </span>{" "}
+            <span className="truncate">{testimonial.role}</span>
           </button>
         ))}
       </div>

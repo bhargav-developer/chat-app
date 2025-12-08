@@ -8,17 +8,29 @@ import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-w
 import { ContainerTextFlip } from "@/components/ui/container-text-flip";
 import { CanvasRevealEffectDemo } from "@/Components/CanvasRevelDemo";
 import { Globe } from "@/components/ui/globe";
-import FancyTestimonialsSlider from "@/components/ui/testimonal-slider";
+import FancyTestimonialsSlider from "@/components/ui/testimonal-slider"
 import SocialCard from "@/Components/SocialCard"
+
 
 const LandingPage = () => {
   const router = useRouter();
 
   const testimonials = [
-    { img: "https://avatar.vercel.sh/karthik", quote: "...", name: "Arun" },
-    { img: "https://avatar.vercel.sh/nick", quote: "...", name: "Chandan" },
-    { img: "https://avatar.vercel.sh/42", quote: "...", name: "Prasidh" },
-  ];
+  {
+    img: "https://avatar.vercel.sh/arun",
+    quote: "ChatSync is insanely fast — sharing files and messages feels instant.",
+    name: "Arun",
+    role: "Developer",
+  },
+  {
+    img: "https://avatar.vercel.sh/chandan",
+    quote: "The security on ChatSync is unmatched. It feels premium yet effortless.",
+    name: "Chandan",
+    role: "Designer",
+  },
+];
+
+
 
   const faqs = [
     { q: "Is ChatSync free to use?", a: "Yes." },
@@ -112,7 +124,7 @@ const LandingPage = () => {
           <div className="max-w-6xl mx-auto text-center mb-10">
             <h3 className="text-4xl font-extrabold tracking-tight">What People Are Saying</h3>
           </div>
-          {/* <FancyTestimonialsSlider testimonials={testimonials} /> */}
+          <FancyTestimonialsSlider testimonials={testimonials} autorotateTiming={5000} />
         </section>
 
         {/* GLOBE */}
@@ -140,24 +152,24 @@ const LandingPage = () => {
         </div>
 
         {/* CONTACT DEVELOPER */}
-<section id="contact-developer" className="py-32 bg-gradient-to-b from-black via-gray-900 to-black px-6 relative overflow-hidden">
-  <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(236,72,153,0.18),transparent_70%)]" />
+        <section id="contact-developer" className="py-32 bg-gradient-to-b from-black via-gray-900 to-black px-6 relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(236,72,153,0.18),transparent_70%)]" />
 
-  <div className="max-w-4xl mx-auto text-center relative z-10">
-    <h3 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-6">
-      Contact Developer
-    </h3>
-    <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed mb-16">
-      Have feedback, want to collaborate, or found a feature you'd love to see?
-      I’d love to hear from you. Reach out anytime.
-    </p>
+          <div className="max-w-4xl mx-auto text-center relative z-10">
+            <h3 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-6">
+              Contact Developer
+            </h3>
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed mb-16">
+              Have feedback, want to collaborate, or found a feature you'd love to see?
+              I’d love to hear from you. Reach out anytime.
+            </p>
 
-    {/* Social animated card */}
-    <div className="flex justify-center mb-16">
-      <SocialCard />
-    </div>
-  </div>
-</section>
+            {/* Social animated card */}
+            <div className="flex justify-center mb-16">
+              <SocialCard />
+            </div>
+          </div>
+        </section>
 
 
 
