@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://lh3.googleusercontent.com/gg-dl/ABS2GSk3D-g7KmL2jSxXCVFc3geX67xzbZqGs8WEXjZkA-sSKLaMNKbOsRZ2d_UUEjcUe8k1VW5ZnQakWbDWrtaWZga-3-Bgm9HaccTgCG5EVlqDEGpxgiLQZ8aTLP483DtegtB-e82zxm4V9zyTknAd3ycq2TqhAvHlEgBHq3lm5tIbc4E4kA=s1024-rj" width="120px" alt="ChatSync Logo"/>
+  <img src="https://res.cloudinary.com/doql04ndg/image/upload/v1765303070/Chat_Sync_refjma.jpg" width="120px" alt="ChatSync Logo"/>
 
   <h1><b>ChatSync — Real-Time Encrypted Chat & File Transfer ⚡</b></h1>
 
