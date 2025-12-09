@@ -2,7 +2,7 @@
 
 import { useUserStore } from "@/lib/userStore";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import {toast} from "sonner";
 import {
   Bell,
   LogOut,
@@ -92,7 +92,8 @@ export default function Home() {
         {/* Top Navbar */}
         <header className="bg-white shadow px-6 py-4 flex items-center justify-between sticky top-0 z-20">
           <div>
-            {user?.name && <div className="md:text-4xl text-xl p-1 font-semibold text-center"> Hello , {user.name}</div>
+            {user?.name && <div 
+            className="md:text-4xl text-xl p-1 font-semibold text-center"> Hello , {user.name}</div>
             // <SplitText
             //     text={`Hello, ${user?.name}`}
             //     className="md:text-4xl text-xl p-1 font-semibold text-center"

@@ -2,7 +2,7 @@
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import {toast} from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { login } from "../apiEndPoints/auth";
 import Image from "next/image";
@@ -42,7 +42,7 @@ const Page = () => {
       const result = await login({ email, password });
       console.log(result,typeof(result))
     if ("status" in result && result.status === 200) {
-        toast.success("Successfully logged in.");
+        toast("Successfully logged in.");
         router.push("/dashboard");
       }
     } catch (error) {
