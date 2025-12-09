@@ -41,6 +41,7 @@ export default function Home() {
   useEffect(() => {
     if(user && user.id){
       findRecentChats()
+      console.log(user)
     }
   }, [user])
 
@@ -91,30 +92,29 @@ export default function Home() {
         {/* Top Navbar */}
         <header className="bg-white shadow px-6 py-4 flex items-center justify-between sticky top-0 z-20">
           <div>
-            {user?.name &&
-              <SplitText
-                text={`Hello, ${user?.name}`}
-                className="md:text-4xl text-xl p-1 font-semibold text-center"
+            {user?.name && <div className="md:text-4xl text-xl p-1 font-semibold text-center"> Hello , {user.name}</div>
+            // <SplitText
+            //     text={`Hello, ${user?.name}`}
+            //     className="md:text-4xl text-xl p-1 font-semibold text-center"
 
-                delay={100}
+            //     delay={100}
 
-                duration={0.4}
+            //     duration={0.4}
 
-                ease="power3.out"
+            //     ease="power3.out"
 
-                splitType="chars"
+            //     splitType="chars"
 
-                from={{ opacity: 0, y: 40 }}
+            //     from={{ opacity: 0, y: 40 }}
 
-                to={{ opacity: 1, y: 0 }}
+            //     to={{ opacity: 1, y: 0 }}
 
-                threshold={0.1}
+            //     threshold={0.1}
 
-                rootMargin="-100px"
+            //     rootMargin="-100px"
 
-                textAlign="center"
-
-              />
+            //     textAlign="center"
+            //   />
             }
             <p className="text-sm text-gray-500">You have {unrepliedMessages} unreplied messages.</p>
           </div>
