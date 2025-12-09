@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://res.cloudinary.com/doql04ndg/image/upload/v1765303363/Chat_Sync-Photoroom_rzxgn4.png" width="120px" alt="ChatSync Logo"/>
+  <img src="https://res.cloudinary.com/doql04ndg/image/upload/v1765303500/logo-Photoroom_hlwio6.png" width="220px" alt="ChatSync Logo"/>
 
   <h1><b>ChatSync — Real-Time Encrypted Chat & File Transfer ⚡</b></h1>
 
