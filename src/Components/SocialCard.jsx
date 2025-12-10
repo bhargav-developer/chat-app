@@ -33,7 +33,7 @@ export default function SocialCard() {
       </Link>
 
       {/* LinkedIn */}
-      <Link href="https://www.linkedin.com/in/USERNAME" target="_blank">
+      <Link href="https://www.linkedin.com/in/bhargav-chakravarthy-b919b6240/" target="_blank">
         <div
           className="box box2"
           onMouseEnter={() => setLabel("Linked-In")}
@@ -52,7 +52,7 @@ export default function SocialCard() {
       </Link>
 
       {/* LeetCode */}
-      <Link href="https://leetcode.com/USERNAME" target="_blank">
+      <Link href="https://leetcode.com/u/bhargav-leetcode/" target="_blank">
         <div
           className="box box3"
           onMouseEnter={() => setLabel("Leet-Code")}
