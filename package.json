@@ -38,6 +38,7 @@
     "nodemon": "^3.1.10",
     "react": "^19.2.1",
     "react-dom": "^19.2.0",
+    "react-draggable": "^4.5.0",
     "react-hot-toast": "^2.5.2",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
