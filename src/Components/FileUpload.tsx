@@ -24,12 +24,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
   const socket = useSocketStore((state) => state.socket);
   const { roomId } = fileTransferStore();
 
-  useEffect(() => {
-    if (!socket) return
-    socket.on("close-file-transfer", () => {
-      onClose()
-    })
-  }, [socket])
 
   const updateFileStatus = useCallback(
     (id: string, updates: Partial<FileUploadStatus>) => {
@@ -39,12 +33,15 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
     },
     []
   );
+  const CHUNK_SIZE = 1024 * 1024 * 2; // 2MB per chunk (good for large files)
+  const ACK_INTERVAL = 32;            // send ACK every 32 chunks
 
   const startFileUpload = async (uploadStatus: FileUploadStatus) => {
     if (!socket) return;
 
     const { file, id } = uploadStatus;
 
+    // Send file metadata
     socket.emit("file-meta", {
       roomId,
       fileName: file.name,
@@ -52,19 +49,37 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
       size: file.size,
     });
 
-    let sentBytes = 0;
-    let seq = 0;
     let offset = 0;
+    let seq = 0;
+    let sentBytes = 0;
 
     updateFileStatus(id, { status: "uploading" });
 
-    const waitForChunkAck = () =>
-      new Promise((resolve) => socket.once("chunk-ack", resolve));
+    // Wait for ack
+    const waitForAck = () =>
+      new Promise(resolve => socket.once("chunk-ack", resolve));
 
-    while (offset < file.size) {
+    while (socket.connected && offset < file.size) {
+      // -----------------------
+      // 🧠 Backpressure control
+      // -----------------------
+      const ws = (socket.io.engine.transport as any)?.ws;
+      if (ws && ws.bufferedAmount > 10 * 1024 * 1024) {
+        await new Promise(res => setTimeout(res, 5));
+        continue;
+      }
+
+      if (ws && ws.bufferedAmount > 10 * 1024 * 1024) {
+        // If more than 10MB waiting, slow down sending
+        await new Promise(res => setTimeout(res, 5));
+        continue;
+      }
+
+      // Next slice of file
       const nextOffset = offset + CHUNK_SIZE;
       const chunk = await file.slice(offset, nextOffset).arrayBuffer();
 
+      // Send chunk
       socket.emit("send-file-chunk", {
         roomId,
         fileName: file.name,
@@ -72,18 +87,25 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
         buffer: chunk,
       });
 
-      sentBytes += chunk.byteLength;
+      // Update counters
       offset = nextOffset;
       seq++;
+      sentBytes += chunk.byteLength;
 
+      // Update UI
       updateFileStatus(id, {
         progress: Math.round((sentBytes / file.size) * 100),
       });
 
-      if (seq % 16 === 0) await waitForChunkAck();
-
+      // -----------------------
+      // 🧠 Only pause every N chunks
+      // -----------------------
+      if (seq % ACK_INTERVAL === 0) {
+        await waitForAck(); // wait for receiver to catch up
+      }
     }
 
+    // Upload ends
     socket.emit("file-end", {
       roomId,
       fileName: file.name,
@@ -92,7 +114,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
 
     updateFileStatus(id, { status: "completed" });
   };
-
 
 
 
@@ -120,6 +141,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onClose, receiverId }) => {
 
   const handleClose = () => {
     if (socket) {
+      console.log("sent colse req")
       socket.emit("close-file-transfer", { roomId })
     }
     onClose();

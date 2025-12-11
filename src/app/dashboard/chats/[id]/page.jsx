@@ -31,7 +31,7 @@ function page({ params }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const { statusMap, setStatus } = useUsersStore();
   const { setRoomId } = fileTransferStore();
-  const socketUrl = process.env.NEXT_PUBLIC_SOCKET
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
 
 
   const handleDeleteClick = () => setIsOpen(true);

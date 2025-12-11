@@ -45,6 +45,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     });
 
     socket.on("update_users", (users) => {
+      console.log("update", users)
       Object.entries(users).forEach(([uid, state]) => setStatus(uid, state));
     });
 

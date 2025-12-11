@@ -32,32 +32,38 @@ const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
       fileWriterRef.current = (window as any).__fileWriter ?? null;
     });
 
-    let ackCounter = 0;
+  let ackCounter = 0;
 
-    socket.on("receive-file-chunk", async ({ fileName, chunk }) => {
-      const uint = new Uint8Array(chunk);
+socket.on("receive-file-chunk", async ({ fileName, chunk }) => {
+  const uint = new Uint8Array(chunk);
 
-      if (fileWriterRef.current) {
-        await fileWriterRef.current.write(uint);
-      } else {
-        fileBuffersRef.current.get(fileName)?.push(uint);
-      }
+  // Write to file or buffer
+  if (fileWriterRef.current) {
+    await fileWriterRef.current.write(uint);
+  } else {
+    fileBuffersRef.current.get(fileName)?.push(uint);
+  }
 
-      setFiles(prev =>
-        prev.map(f =>
-          f.file === fileName
-            ? {
-              ...f,
-              receivedBytes: f.receivedBytes + uint.length,
-              progress: Math.round(((f.receivedBytes + uint.length) / f.size) * 100)
-            }
-            : f
-        )
-      );
-      ackCounter++;
-      if (++ackCounter % 16 === 0) socket.emit("chunk-ack",{roomId});
+  // Update UI
+  setFiles(prev =>
+    prev.map(f =>
+      f.file === fileName
+        ? {
+            ...f,
+            receivedBytes: f.receivedBytes + uint.length,
+            progress: Math.round(((f.receivedBytes + uint.length) / f.size) * 100),
+          }
+        : f
+    )
+  );
 
-    });
+  // Correct ACK logic
+  ackCounter++;
+  if (ackCounter % 32 === 0) {
+    socket.emit("chunk-ack", { roomId });
+  }
+});
+
 
     socket.on("file-transfer-end", async ({ fileName, fileType }) => {
       if (fileWriterRef.current) {

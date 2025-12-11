@@ -33,7 +33,7 @@ export default function Home() {
   const { user } = useUserStore();
   const router = useRouter();
   const [recentChats, setRecentChats] = useState<Chats[]>([]);
-  const socketUrl = process.env.NEXT_PUBLIC_SOCKET;
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
   const {socket} = useSocketStore();
   const { statusMap, setStatus } = useUsersStore();
 

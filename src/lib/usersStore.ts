@@ -7,7 +7,7 @@ interface Status {
 
 interface UseState {
     statusMap: Map<string, Status>;
-    setStatus: (userId: string,data: Status) => void;
+    setStatus: (userId: string,data: any) => void;
 }
 
 export const useUsersStore = create<UseState>((set) => ({
