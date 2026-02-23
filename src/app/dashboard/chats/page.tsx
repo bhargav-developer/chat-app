@@ -37,7 +37,7 @@ const Page = () => {
 
   const { user } = useUserStore();
   const usersId = []
-  const socketUrl: string | undefined = process.env.NEXT_PUBLIC_SOCKET; 
+  const socketUrl: string | undefined = process.env.NEXT_PUBLIC_SOCKET_URL; 
 
 
 
@@ -45,7 +45,8 @@ const Page = () => {
     if (user) {
       findRecentChats();
     }
-  }, [socket])
+  }, [socket,user])
+  
 
 
   const router = useRouter();
