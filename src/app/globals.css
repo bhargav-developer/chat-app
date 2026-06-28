@@ -49,6 +49,16 @@ body,
   height: 100%;
 }
 
+
+@keyframes fadeInSlow {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeInSlow {
+  animation: fadeInSlow 0.35s ease-out forwards;
+}
+
 @theme inline {
  --radius-sm: calc(var(--radius) - 4px);
  --radius-md: calc(var(--radius) - 2px);

@@ -9,64 +9,58 @@ import {
   useMotionValueEvent,
 } from "motion/react";
 import React, { useRef, useState } from "react";
+import { PinIcon } from "lucide-react";
 
-interface NavbarProps {
+/* ───────────── ROOT NAVBAR ───────────── */
+export const Navbar = ({
+  children,
+  className,
+  pinned,
+}: {
   children: React.ReactNode;
   className?: string;
-}
-interface NavBodyProps {
-  children: React.ReactNode;
-  className?: string;
-  visible?: boolean;
-}
-interface NavItemsProps {
-  items: { name: string; link: string }[];
-  className?: string;
-  onItemClick?: () => void;
-}
-interface MobileNavProps {
-  children: React.ReactNode;
-  className?: string;
-  visible?: boolean;
-}
-interface MobileNavHeaderProps {
-  children: React.ReactNode;
-  className?: string;
-}
-interface MobileNavMenuProps {
-  children: React.ReactNode;
-  className?: string;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export const Navbar = ({ children, className }: NavbarProps) => {
+  pinned?: boolean;
+}) => {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
+  const { scrollY } = useScroll({ target: ref });
+
   const [visible, setVisible] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setVisible(latest > 90);
+    if (!pinned) setVisible(latest > 90);
   });
 
   return (
     <motion.div
       ref={ref}
-      className={cn("fixed inset-x-0 top-0 z-50 w-full", className)}
+      className={cn(
+        `${pinned ? "absolute" : "fixed"} inset-x-0 top-0 z-50 w-full`,
+        className
+      )}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
-          ? React.cloneElement(child as React.ReactElement<{ visible?: boolean }>, { visible })
+          ? React.cloneElement(child as any, { visible })
           : child
       )}
     </motion.div>
   );
 };
 
-export const NavBody = ({ children, className, visible }: NavBodyProps) => (
+/* ───────────── DESKTOP NAV BODY ───────────── */
+export const NavBody = ({
+  children,
+  className,
+  visible,
+  pinned,
+  setPinned,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  visible?: boolean;
+  pinned: boolean;
+  setPinned: (v: boolean) => void;
+}) => (
   <motion.div
     animate={{
       backdropFilter: visible ? "blur(12px)" : "none",
@@ -75,25 +69,48 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => (
     }}
     transition={{ type: "spring", stiffness: 190, damping: 38 }}
     className={cn(
-      "mx-auto hidden max-w-7xl w-full lg:flex items-center justify-between rounded-full px-6 py-3 bg-transparent",
-      visible && "!bg-black/50 border border-white/15 shadow-[0_0_18px_rgba(255,255,255,0.08)]",
+      "mx-auto hidden max-w-7xl w-full lg:flex items-center justify-between rounded-full px-6 py-3",
+      visible && "bg-black/50 border border-white/20 shadow-[0_0_18px_rgba(255,255,255,0.08)]",
       className
     )}
   >
     {children}
+
+
+    {/* <div className="flex items-center gap-4">
+      {(!visible || pinned) && (
+        <button
+          onClick={() => setPinned(!pinned)}
+          className="rounded-md p-[6px] bg-white/10 hover:bg-white/20 transition"
+          title={pinned ? "Unpin navbar" : "Pin navbar"}
+        >
+          <PinIcon
+            size={16}
+            className={`${pinned ? "text-fuchsia-400 rotate-45" : "text-white/70"} transition`}
+          />
+        </button>
+      )}
+
+    </div> */}
   </motion.div>
 );
 
-export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
+/* ───────────── NAV ITEMS ───────────── */
+export const NavItems = ({
+  items,
+  className,
+  onItemClick,
+}: {
+  items: { name: string; link: string }[];
+  className?: string;
+  onItemClick?: () => void;
+}) => {
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
     <motion.div
       onMouseLeave={() => setHovered(null)}
-      className={cn(
-        "flex flex-row gap-2 items-center justify-center text-sm font-medium",
-        className
-      )}
+      className={cn("flex flex-row gap-2 items-center text-sm font-medium", className)}
     >
       {items.map((item, idx) => (
         <a
@@ -109,12 +126,14 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
               className="absolute inset-0 rounded-full bg-white/10 backdrop-blur-md"
             />
           )}
-          <span className={cn(
-            "relative z-20 font-semibold",
-            hovered === idx
-              ? "bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent"
-              : "text-white/85 hover:text-white"
-          )}>
+          <span
+            className={cn(
+              "relative z-20 font-semibold",
+              hovered === idx
+                ? "bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent"
+                : "text-white/85 hover:text-white"
+            )}
+          >
             {item.name}
           </span>
         </a>
@@ -123,12 +142,10 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
   );
 };
 
-export const MobileNav = ({ children, className, visible }: MobileNavProps) => (
+/* ───────────── MOBILE NAV ───────────── */
+export const MobileNav = ({ children, className, visible }: any) => (
   <motion.div
-    animate={{
-      y: visible ? 12 : 28,
-      width: visible ? "92%" : "100%",
-    }}
+    animate={{ y: visible ? 12 : 28, width: visible ? "92%" : "100%" }}
     transition={{ type: "spring", stiffness: 180, damping: 38 }}
     className={cn(
       "mx-auto flex lg:hidden w-full flex-col items-center justify-between px-3 py-2",
@@ -140,11 +157,11 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => (
   </motion.div>
 );
 
-export const MobileNavHeader = ({ children, className }: MobileNavHeaderProps) => (
-  <div className={cn("flex w-full justify-between items-center", className)}>{children}</div>
+export const MobileNavHeader = ({ children }: any) => (
+  <div className="flex w-full justify-between items-center">{children}</div>
 );
 
-export const MobileNavMenu = ({ children, isOpen }: MobileNavMenuProps) => (
+export const MobileNavMenu = ({ children, isOpen }: any) => (
   <AnimatePresence>
     {isOpen && (
       <motion.div
@@ -160,12 +177,10 @@ export const MobileNavMenu = ({ children, isOpen }: MobileNavMenuProps) => (
   </AnimatePresence>
 );
 
-export const MobileNavToggle = ({
-  isOpen,
-  onClick,
-}: { isOpen: boolean; onClick: () => void }) =>
+export const MobileNavToggle = ({ isOpen, onClick }: any) =>
   isOpen ? <IconX className="text-white" onClick={onClick} /> : <IconMenu2 className="text-white" onClick={onClick} />;
 
+/* ───────────── LOGO + BUTTON ───────────── */
 export const NavbarLogo = () => (
   <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent cursor-pointer">
     ChatSync

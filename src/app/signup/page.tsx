@@ -75,7 +75,7 @@ const Page = () => {
         {/* Left Image Section */}
         <div className="w-1/2 hidden md:block relative">
           <img
-            src="https://images.unsplash.com/photo-1587614295999-6cbcb8cde229"
+            src="https://imgs.search.brave.com/B20suSW3IjmryT976Fbx8A6pOAlEkzank7sxwp8z35Q/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJhY2Nlc3Mu/Y29tL2Z1bGwvNjU2/MjQ0Ni5qcGc"
             alt="Signup Visual"
             className="object-cover w-full h-full"
           />

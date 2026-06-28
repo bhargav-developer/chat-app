@@ -15,63 +15,98 @@ interface ReceivedFile {
   fileType?: string;
 }
 
+interface FileMeta {
+  fileName: string;
+  fileType: string;
+  size: number;
+}
+
 const FileRecieve: React.FC<FileUploadProps> = ({ onClose }) => {
   const socket = useSocketStore((s) => s.socket);
   const { roomId } = fileTransferStore();
   const [files, setFiles] = useState<ReceivedFile[]>([]);
 
-  const fileWriterRef = useRef<FileSystemWritableFileStream | null>(null);
   const fileBuffersRef = useRef<Map<string, Uint8Array[]>>(new Map());
+  const fileMetaRef = useRef<Map<string, FileMeta>>(new Map());  // ✅ track meta per file
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("meta-transfer", ({ fileName, size, fileType }) => {
-      setFiles(prev => [...prev, { file: fileName, size, progress: 0, receivedBytes: 0, fileType }]);
-      if (!("showSaveFilePicker" in window)) fileBuffersRef.current.set(fileName, []);
-      fileWriterRef.current = (window as any).__fileWriter ?? null;
-    });
-
     let ackCounter = 0;
 
-    socket.on("receive-file-chunk", async ({ fileName, chunk }) => {
-      const uint = new Uint8Array(chunk);
-
-      if (fileWriterRef.current) {
-        await fileWriterRef.current.write(uint);
-      } else {
-        fileBuffersRef.current.get(fileName)?.push(uint);
+    socket.on("meta-transfer", ({ fileName, size, fileType }: FileMeta) => {
+      if (!fileName) {
+        console.error("Received meta-transfer with undefined fileName");
+        return;
       }
+      // ✅ Store meta keyed by fileName
+      fileMetaRef.current.set(fileName, { fileName, fileType, size });
+      fileBuffersRef.current.set(fileName, []);
+
+      setFiles(prev => [...prev, {
+        file: fileName,
+        size,
+        progress: 0,
+        receivedBytes: 0,
+        fileType
+      }]);
+    });
+
+    socket.on("receive-file-chunk", async ({ fileName, chunk }: { fileName: string; chunk: ArrayBuffer }) => {
+      if (!fileName || !fileBuffersRef.current.has(fileName)) {
+        console.error("Received chunk for unknown file:", fileName);
+        return;
+      }
+
+      const uint = new Uint8Array(chunk);
+      fileBuffersRef.current.get(fileName)!.push(uint);
 
       setFiles(prev =>
         prev.map(f =>
           f.file === fileName
             ? {
-              ...f,
-              receivedBytes: f.receivedBytes + uint.length,
-              progress: Math.round(((f.receivedBytes + uint.length) / f.size) * 100)
-            }
+                ...f,
+                receivedBytes: f.receivedBytes + uint.length,
+                progress: Math.min(100, Math.round(((f.receivedBytes + uint.length) / f.size) * 100)),
+              }
             : f
         )
       );
-      ackCounter++;
-      if (++ackCounter % 16 === 0) socket.emit("chunk-ack",{roomId});
 
+      ackCounter++;
+      if (ackCounter % 32 === 0) {
+        socket.emit("chunk-ack", { roomId });
+      }
     });
 
-    socket.on("file-transfer-end", async ({ fileName, fileType }) => {
-      if (fileWriterRef.current) {
-        await fileWriterRef.current.close();
-        fileWriterRef.current = null;
-      } else {
-        const blob = new Blob(fileBuffersRef.current.get(fileName)! as BlobPart[], { type: fileType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(url);
+    socket.on("file-transfer-end", ({ fileName }: { fileName: string }) => {
+      if (!fileName) {
+        console.error("file-transfer-end received with undefined fileName");
+        return;
       }
+
+      const meta = fileMetaRef.current.get(fileName);
+      const buffers = fileBuffersRef.current.get(fileName);
+
+      if (!meta || !buffers) {
+        console.error("Missing meta or buffers for file:", fileName);
+        return;
+      }
+
+      // ✅ Use stored meta for reliable fileType + fileName
+      const blob = new Blob(buffers as BlobPart[], { type: meta.fileType || 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = meta.fileName;  // ✅ guaranteed to not be undefined
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Cleanup
+      fileBuffersRef.current.delete(fileName);
+      fileMetaRef.current.delete(fileName);
     });
 
     socket.on("close-file-transfer", onClose);

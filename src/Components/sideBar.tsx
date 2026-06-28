@@ -13,9 +13,9 @@ import {
   X,
 } from "lucide-react";
 import { useUserStore } from "@/lib/userStore";
-import { useSocket } from "@/app/hooks/socketContext";
 import Avatar from "./Avatar";
 import { logout } from "@/app/apiEndPoints/auth";
+import { useJoinSocket } from "@/hooks/connectToSocket";
 
 const SideBar = () => {
   const { user } = useUserStore();
@@ -41,7 +41,7 @@ const SideBar = () => {
     { name: "Settings", href: "/dashboard/settings", Icon: Settings },
   ];
 
-  useSocket(user?.id || "");
+  useJoinSocket(user?.id || "");
 
   function NavBtn({ href, name, Icon }: any) {
     const isActive = href === pathname;
