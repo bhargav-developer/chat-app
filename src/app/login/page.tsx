@@ -2,7 +2,7 @@
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {toast} from "sonner";
+import {toast} from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 import { login } from "../apiEndPoints/auth";
 import Image from "next/image";

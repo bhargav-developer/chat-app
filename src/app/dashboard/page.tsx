@@ -41,7 +41,6 @@ export default function Home() {
   useEffect(() => {
     if(user && user.id){
       findRecentChats()
-      console.log(user)
     }
   }, [user])
 

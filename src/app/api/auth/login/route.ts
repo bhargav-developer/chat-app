@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const isMatch = await user.comparePassword(data.password);
     if (!isMatch) {
-      return NextResponse.json({ message: "Invalid credentials." }, { status: 401 });
+      return NextResponse.json({ message: "Invalid credentials." }, { status: 401  });
     }
 
     const SECRET_KEY = process.env.JWT_SECRET!;
